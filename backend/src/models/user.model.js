@@ -18,8 +18,8 @@ const userSchema = new mongoose.Schema(
 		userType: {
 			type: String,
 			required: true,
-			enum: ['NGO', 'Individual', 'Restaurant'],
-			default: 'Individual'
+			enum: ['ngo', 'individual', 'restaurant'],
+			default: 'individual'
 		},
 		lastLogin: {
 			type: Date,

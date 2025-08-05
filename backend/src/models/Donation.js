@@ -63,7 +63,7 @@ const donationSchema = new mongoose.Schema({
     donorType: {
         type: String,
         required: true,
-        enum: ['individual', 'restaurant', 'ngo']
+        enum: ['ngo', 'individual', 'restaurant']
     },
     status: {
         type: String,

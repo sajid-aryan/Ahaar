@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
 import { ArrowLeft, MapPin, Clock, Package, AlertCircle, Upload, X } from 'lucide-react';
 import axios from 'axios';
+import { useAuthStore } from '../store/authStore';
 
 const CreateDonationPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -19,9 +21,9 @@ const CreateDonationPage = () => {
     expiryDate: '',
     pickupInstructions: '',
     contactPhone: '',
-    // Sample donor info (for demo purposes without user auth)
-    donorName: 'Demo Restaurant',
-    donorType: 'restaurant'
+    // Use actual user info from auth store
+    donorName: user?.name || '',
+    donorType: user?.userType?.toLowerCase() || ''
   });
 
   const handleChange = (e) => {
@@ -75,19 +77,32 @@ const CreateDonationPage = () => {
       // Add all text fields
       Object.keys(formData).forEach(key => {
         if (formData[key]) {
-          formDataToSend.append(key, formData[key]);
+          // Convert donorType to lowercase to match backend enum
+          if (key === 'donorType') {
+            // Map capitalized values to lowercase
+            const donorTypeMapping = {
+              'Individual': 'individual',
+              'Restaurant': 'restaurant', 
+              'NGO': 'ngo',
+              'Ngo': 'ngo'
+            };
+            const mappedValue = donorTypeMapping[formData[key]] || formData[key].toLowerCase();
+            formDataToSend.append(key, mappedValue);
+          } else {
+            formDataToSend.append(key, formData[key]);
+          }
         }
       });
       
       // Add hardcoded donor information for demo purposes
-      formDataToSend.append('donorId', '65421f8b3c69c28f7acd88b9'); // Demo donor ID
+      formDataToSend.append('donorId', user?._id || '65421f8b3c69c28f7acd88b9'); // Use actual user ID or fallback
       
       // Add image if selected
       if (selectedImage) {
         formDataToSend.append('image', selectedImage);
       }
 
-      const response = await axios.post('http://localhost:3003/api/donations', formDataToSend, {
+      const response = await axios.post('http://localhost:3004/api/donations', formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

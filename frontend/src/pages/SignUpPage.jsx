@@ -19,7 +19,15 @@ const SignUpPage = () => {
 		e.preventDefault();
 
 		try {
-			await signup(email, password, name, userType);
+			// Convert userType to lowercase to match backend enum
+			const userTypeMapping = {
+				'Individual': 'individual',
+				'Restaurant': 'restaurant', 
+				'NGO': 'ngo'
+			};
+			const mappedUserType = userTypeMapping[userType] || userType.toLowerCase();
+			
+			await signup(email, password, name, mappedUserType);
 			navigate("/");
 		} catch (error) {
 			console.log(error);

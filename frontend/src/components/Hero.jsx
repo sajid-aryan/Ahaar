@@ -19,7 +19,7 @@ const Hero = () => {
         ) : (
           <>
             <Link to="/signup" className="btn btn-success">Get Started</Link>
-            <Link to="/browse" className="btn btn-outline btn-accent">Browse Donations</Link>
+            {/* <Link to="/browse" className="btn btn-outline btn-accent">Browse Donations</Link> */}
           </>
         )}
       </div>

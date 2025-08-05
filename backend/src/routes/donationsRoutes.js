@@ -1,5 +1,5 @@
 import express from 'express';
-// import upload from '../middleware/upload.js';
+import upload from '../middleware/upload.js';
 import { 
   getAllDonations, 
   createDonation, 
@@ -17,7 +17,7 @@ const router = express.Router();
 router.get('/', getAllDonations);
 
 // Create new donation
-// router.post('/', upload.single('image'), createDonation);
+router.post('/', upload.single('image'), createDonation);
 
 // Get donations by user
 router.get('/my/:userId', getDonationsByUser);

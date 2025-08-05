@@ -13,7 +13,7 @@ const BrowsePage = () => {
   useEffect(() => {
     const fetchDonations = async () => {
       try {
-        const res = await axios.get("http://localhost:3003/api/donations");
+        const res = await axios.get("http://localhost:3004/api/donations");
         console.log('Donations response:', res.data);
         setDonations(res.data.donations || []);
       } catch (error) {
@@ -85,7 +85,7 @@ const BrowsePage = () => {
                 {donation.image && (
                   <figure>
                     <img 
-                      src={`http://localhost:3003${donation.image}`}
+                      src={`http://localhost:3004${donation.image}`}
                       alt={donation.title}
                       className="h-48 w-full object-cover"
                     />
