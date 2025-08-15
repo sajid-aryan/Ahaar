@@ -1,14 +1,19 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from 'react-router';
-import { ArrowLeft, MapPin, Package } from 'lucide-react';
+import { ArrowLeft, MapPin, Package, Heart } from 'lucide-react';
 import axios from 'axios';
+import { useAuthStore } from '../store/authStore';
+import toast from 'react-hot-toast';
 
 const BrowsePage = () => {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('all');
+  const [claimingId, setClaimingId] = useState(null);
+  const [likingId, setLikingId] = useState(null);
 
   useEffect(() => {
     const fetchDonations = async () => {
@@ -27,15 +32,121 @@ const BrowsePage = () => {
     fetchDonations();
   }, []);
 
-  const filteredDonations = donations.filter(donation => {
-    if (filter === 'all') return true;
-    return donation.category === filter;
-  });
+  const filteredDonations = donations
+    .filter(donation => {
+      if (filter === 'all') return true;
+      return donation.category === filter;
+    })
+    .sort((a, b) => {
+      // First, sort by status: available donations first, then claimed/completed/expired
+      const statusPriority = {
+        'available': 0,
+        'claimed': 1,
+        'completed': 2,
+        'expired': 3
+      };
+      
+      const aPriority = statusPriority[a.status] || 4;
+      const bPriority = statusPriority[b.status] || 4;
+      
+      if (aPriority !== bPriority) {
+        return aPriority - bPriority;
+      }
+      
+      // If same status, sort by creation date (newest first)
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+
+  // Debug logging to see the sorting in action
+  console.log('Donations before sorting:', donations.map(d => ({ title: d.title, status: d.status })));
+  console.log('Donations after sorting:', filteredDonations.map(d => ({ title: d.title, status: d.status })));
 
   const categories = ['all', 'food', 'clothing', 'medical', 'other'];
 
+  const handleClaimDonation = async (donationId) => {
+    if (!user || user.userType !== 'ngo') {
+      toast.error('Only NGOs can claim donations');
+      return;
+    }
+
+    // Check if the donation was created by the same NGO
+    const donation = donations.find(d => d._id === donationId);
+    if (donation && donation.donorId === user._id) {
+      toast.error('You cannot claim your own donation');
+      return;
+    }
+
+    setClaimingId(donationId);
+    
+    try {
+      const response = await axios.post(`http://localhost:3004/api/donations/${donationId}/claim`, {
+        claimerId: user._id,
+        claimerName: user.name
+      }, {
+        withCredentials: true
+      });
+
+      if (response.data.success) {
+        toast.success('Donation claimed successfully!');
+        // Update the local donations list to reflect the status change
+        setDonations(prevDonations => 
+          prevDonations.map(donation => 
+            donation._id === donationId 
+              ? { ...donation, status: 'claimed', claimerId: user._id, claimerName: user.name }
+              : donation
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error claiming donation:', error);
+      toast.error(error.response?.data?.message || 'Failed to claim donation');
+    } finally {
+      setClaimingId(null);
+    }
+  };
+
+  const handleLikeDonation = async (donationId) => {
+    if (!user) {
+      toast.error('Please log in to like donations');
+      return;
+    }
+
+    setLikingId(donationId);
+    
+    try {
+      const response = await axios.post(`http://localhost:3004/api/donations/${donationId}/like`, {}, {
+        withCredentials: true
+      });
+
+      if (response.data.success) {
+        toast.success(response.data.message);
+        // Update the local donations list to reflect the new like count
+        setDonations(prevDonations => 
+          prevDonations.map(donation => 
+            donation._id === donationId 
+              ? { 
+                  ...donation, 
+                  likes: response.data.donation.likes,
+                  likedBy: response.data.donation.likedBy
+                }
+              : donation
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error liking donation:', error);
+      toast.error(error.response?.data?.message || 'Failed to like donation');
+    } finally {
+      setLikingId(null);
+    }
+  };
+
+  const closeRatingModal = () => {
+    setRatingModal({ isOpen: false, donationId: null, rating: 0, comment: '' });
+  };
+
   return (
-    <div className="min-h-screen bg-base-100">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-slate-100 to-green-50">
       <div className="container mx-auto px-6 py-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Browse Donations</h1>
@@ -108,29 +219,83 @@ const BrowsePage = () => {
                     <span className="text-lg font-semibold">
                       {donation.quantity}
                     </span>
-                    {donation.location && (
-                      <span className="text-sm text-gray-500">
-                        <MapPin className="w-4 h-4 inline mr-1" />
-                        {donation.location}
-                      </span>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {donation.location && (
+                        <span className="text-sm text-gray-500">
+                          <MapPin className="w-4 h-4 inline mr-1" />
+                          {donation.location}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   
                   <div className="card-actions justify-between mt-4">
                     <div className="text-xs text-gray-500">
                       By {donation.donorName} ({donation.donorType})
+                      {donation.status === 'claimed' && donation.claimerName && (
+                        <div className="text-orange-600 font-medium">
+                          Claimed by {donation.claimerName}
+                        </div>
+                      )}
                     </div>
-                    <div className="flex gap-2">
-                      <button className="btn btn-primary btn-sm">
-                        View Details
-                      </button>
-                      {donation.status === 'available' && (
+                    <div className="flex gap-2 items-center">
+                      {/* Like Button and Count */}
+                      <div className="flex items-center gap-1">
+                        {/* Like Button - only for logged in users */}
+                        {user && (
+                          <button 
+                            className={`btn btn-sm ${
+                              donation.likedBy && donation.likedBy.includes(user._id)
+                                ? 'btn-error text-white' 
+                                : 'btn-outline btn-error'
+                            } ${likingId === donation._id ? 'loading' : ''}`}
+                            onClick={() => handleLikeDonation(donation._id)}
+                            disabled={likingId === donation._id}
+                          >
+                            <Heart className={`w-4 h-4 ${
+                              donation.likedBy && donation.likedBy.includes(user._id)
+                                ? 'fill-current' 
+                                : ''
+                            }`} />
+                          </button>
+                        )}
+                        
+                        {/* Like Count - visible to everyone */}
+                        {!user && donation.likes > 0 && (
+                          <div className="flex items-center gap-1">
+                            <Heart className="w-4 h-4 text-red-600 fill-current" />
+                            <span className="text-red-600 font-semibold text-sm">
+                              {donation.likes}
+                            </span>
+                          </div>
+                        )}
+                        
+                        {user && donation.likes > 0 && (
+                          <span 
+                            className="text-red-600 font-semibold text-sm transition-all duration-300 ease-out transform hover:scale-110"
+                            key={donation.likes}
+                          >
+                            {donation.likes}
+                          </span>
+                        )}
+                      </div>
+                      
+                      {/* Claim Button for NGOs - moved to the right */}
+                      {donation.status === 'available' && user?.userType === 'ngo' && donation.donorId !== user._id && (
                         <button 
-                          className="btn btn-success btn-sm"
-                          onClick={() => window.location.href = `mailto:contact@ahaar.org?subject=Regarding Donation: ${donation.title}`}
+                          className={`btn btn-warning btn-sm ${claimingId === donation._id ? 'loading' : ''}`}
+                          onClick={() => handleClaimDonation(donation._id)}
+                          disabled={claimingId === donation._id}
                         >
-                          Contact
+                          {claimingId === donation._id ? 'Claiming...' : 'Claim'}
                         </button>
+                      )}
+                      
+                      {/* Show when donation is claimed */}
+                      {donation.status === 'claimed' && (
+                        <div className="btn btn-disabled btn-sm">
+                          Already Claimed
+                        </div>
                       )}
                     </div>
                   </div>

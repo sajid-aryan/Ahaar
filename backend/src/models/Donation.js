@@ -83,6 +83,29 @@ const donationSchema = new mongoose.Schema({
     },
     completedAt: {
         type: Date
+    },
+    likes: {
+        type: Number,
+        default: 0
+    },
+    likedBy: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    feedback: {
+        ngoRating: {
+            type: Number,
+            min: 1,
+            max: 5
+        },
+        ngoComment: {
+            type: String,
+            trim: true,
+            maxlength: [500, 'Feedback comment cannot exceed 500 characters']
+        },
+        feedbackDate: {
+            type: Date
+        }
     }
 }, {
     timestamps: true

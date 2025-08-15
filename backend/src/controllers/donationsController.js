@@ -80,6 +80,32 @@ export async function getDonationsByUser(req, res) {
   }
 }
 
+// Get claimed donations by NGO (for NGO claimed donations history)
+export async function getClaimedDonationsByNGO(req, res) {
+  try {
+    const { ngoId } = req.params;
+    const donations = await Donation.find({ 
+      claimerId: ngoId,
+      status: { $in: ['claimed', 'completed'] }
+    })
+      .sort({ claimedAt: -1 })
+      .populate('donorId', 'name userType');
+    
+    res.status(200).json({ 
+      success: true, 
+      donations,
+      count: donations.length 
+    });
+  } catch (error) {
+    console.error('Error fetching claimed donations:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error fetching claimed donations', 
+      error: error.message 
+    });
+  }
+}
+
 // Claim a donation (for NGOs)
 export async function claimDonation(req, res) {
   try {
@@ -245,6 +271,137 @@ export async function completeDonation(req, res) {
     res.status(500).json({ 
       success: false, 
       message: 'Error completing donation', 
+      error: error.message 
+    });
+  }
+}
+
+// Like/Unlike a donation
+export async function likeDonation(req, res) {
+  try {
+    const { id } = req.params;
+    const userId = req.userId; // From verifyToken middleware
+    
+    const donation = await Donation.findById(id);
+    
+    if (!donation) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Donation not found' 
+      });
+    }
+    
+    // Check if user has already liked this donation
+    const hasLiked = donation.likedBy.includes(userId);
+    
+    if (hasLiked) {
+      // Unlike the donation - use updateOne to avoid validation issues
+      await Donation.updateOne(
+        { _id: id },
+        { 
+          $pull: { likedBy: userId },
+          $inc: { likes: -1 }
+        }
+      );
+      
+      // Fetch updated donation
+      const updatedDonation = await Donation.findById(id);
+      
+      res.status(200).json({ 
+        success: true, 
+        message: 'Donation unliked',
+        donation: updatedDonation,
+        hasLiked: false
+      });
+    } else {
+      // Like the donation - use updateOne to avoid validation issues
+      await Donation.updateOne(
+        { _id: id },
+        { 
+          $push: { likedBy: userId },
+          $inc: { likes: 1 }
+        }
+      );
+      
+      // Fetch updated donation
+      const updatedDonation = await Donation.findById(id);
+      
+      res.status(200).json({ 
+        success: true, 
+        message: 'Donation liked',
+        donation: updatedDonation,
+        hasLiked: true
+      });
+    }
+  } catch (error) {
+    console.error('Error liking donation:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error processing like', 
+      error: error.message 
+    });
+  }
+}
+
+// Submit feedback for a completed donation (NGO only)
+export async function submitFeedback(req, res) {
+  try {
+    const { id } = req.params;
+    const { rating, comment } = req.body;
+    const userId = req.userId; // From verifyToken middleware
+    
+    const donation = await Donation.findById(id);
+    
+    if (!donation) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Donation not found' 
+      });
+    }
+    
+    // Check if the donation was claimed by this NGO
+    if (donation.claimerId.toString() !== userId) {
+      return res.status(403).json({ 
+        success: false, 
+        message: 'You can only provide feedback for donations you claimed' 
+      });
+    }
+    
+    // Check if donation is claimed or completed
+    if (donation.status !== 'claimed' && donation.status !== 'completed') {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Feedback can only be submitted for claimed or completed donations' 
+      });
+    }
+    
+    // Check if feedback already exists
+    if (donation.feedback && donation.feedback.ngoRating) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Feedback has already been submitted for this donation' 
+      });
+    }
+    
+    // Add feedback
+    donation.feedback = {
+      ngoRating: rating,
+      ngoComment: comment || '',
+      feedbackDate: new Date()
+    };
+    
+    await donation.save();
+    
+    res.status(200).json({ 
+      success: true, 
+      message: 'Feedback submitted successfully',
+      donation 
+    });
+  } catch (error) {
+    console.error('Error submitting feedback:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error submitting feedback', 
       error: error.message 
     });
   }

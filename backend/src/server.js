@@ -5,11 +5,9 @@ import cookieParser from "cookie-parser";
 import path from 'path';
 import { fileURLToPath } from 'url';
 import authRoutes from "./routes/auth.route.js";
-
 import donationsRoutes from './routes/donationsRoutes.js';
 import { connectDB } from './config/db.js';
 
-// import rateLimiter from './config/upstash.js';
 
 dotenv.config();
 
@@ -34,7 +32,6 @@ app.use("/api/auth", authRoutes);
 const uploadsPath = path.join(__dirname, '../uploads');
 console.log('Static uploads path:', uploadsPath);
 app.use('/uploads', express.static(uploadsPath));
-// app.use(rateLimiter);
 app.use((req, res, next) => {
   console.log(`Request Method: ${req.method}, Request URL: ${req.url}`);
   next();

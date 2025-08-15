@@ -1,5 +1,6 @@
 import express from 'express';
 import upload from '../middleware/upload.js';
+import { verifyToken } from '../middleware/verifyToken.js';
 import { 
   getAllDonations, 
   createDonation, 
@@ -8,7 +9,10 @@ import {
   getDonationById,
   getDonationsByUser,
   claimDonation,
-  completeDonation
+  completeDonation,
+  getClaimedDonationsByNGO,
+  likeDonation,
+  submitFeedback
 } from '../controllers/donationsController.js';
 
 const router = express.Router();
@@ -22,11 +26,20 @@ router.post('/', upload.single('image'), createDonation);
 // Get donations by user
 router.get('/my/:userId', getDonationsByUser);
 
+// Get claimed donations by NGO
+router.get('/claimed/:ngoId', getClaimedDonationsByNGO);
+
 // Claim a donation
-router.post('/:id/claim', claimDonation);
+router.post('/:id/claim', verifyToken, claimDonation);
 
 // Complete a donation
-router.post('/:id/complete', completeDonation);
+router.post('/:id/complete', verifyToken, completeDonation);
+
+// Like/Unlike a donation
+router.post('/:id/like', verifyToken, likeDonation);
+
+// Submit feedback for a completed donation
+router.post('/:id/feedback', verifyToken, submitFeedback);
 
 // Get donation by ID
 router.get('/:id', getDonationById);

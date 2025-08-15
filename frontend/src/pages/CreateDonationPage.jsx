@@ -120,7 +120,7 @@ const CreateDonationPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-base-100">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-slate-100 to-green-50">
       <div className="container mx-auto px-6 py-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Create New Donation</h1>

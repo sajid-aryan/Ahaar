@@ -3,6 +3,8 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import CreateDonationPage from './pages/CreateDonationPage.jsx'
 import Welcome from './pages/Welcome.jsx'
 import BrowsePage from './pages/BrowsePage.jsx'
+import ClaimedDonationsPage from './pages/ClaimedDonationsPage.jsx'
+import MyDonationsPage from './pages/MyDonationsPage.jsx'
 import About from './pages/About.jsx'
 import Footer from './components/Footer.jsx'
 import Navbar from './components/Navbar.jsx'
@@ -58,6 +60,22 @@ function App() {
 						element={
 							<ProtectedRoute>
 								<BrowsePage />
+							</ProtectedRoute>
+						} 
+					/>
+					<Route 
+						path="/claimed-donations" 
+						element={
+							<ProtectedRoute>
+								<ClaimedDonationsPage />
+							</ProtectedRoute>
+						} 
+					/>
+					<Route 
+						path="/my-donations" 
+						element={
+							<ProtectedRoute>
+								<MyDonationsPage />
 							</ProtectedRoute>
 						} 
 					/>
