@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Edit, Trash2, Save, X, Upload } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useAuthStore } from '../store/authStore';
 import LoadingSpinner from '../components/LoadingSpinner';
 
@@ -126,17 +127,19 @@ const ManageNGOProfilePage = () => {
         setProfile(data);
         setEditMode(false);
         setError('');
-        // Redirect to home page after successful save
-        setTimeout(() => {
-          navigate('/');
-        }, 1000);
+        toast.success('Profile updated successfully!');
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to save profile');
+        const errorMessage = errorData.message || 'Failed to save profile';
+        setError(errorMessage);
+        toast.error(errorMessage);
+        throw new Error(errorMessage);
       }
     } catch (error) {
       console.error('Error saving profile:', error);
-      setError('Failed to save profile');
+      const errorMessage = error.message || 'Failed to save profile';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setSaving(false);
     }
@@ -169,13 +172,16 @@ const ManageNGOProfilePage = () => {
           targetAmount: ''
         });
         setShowAddNeed(false);
+        toast.success('New need added successfully!');
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to add need');
+        const errorMessage = errorData.message || 'Failed to add need';
+        toast.error(errorMessage);
+        throw new Error(errorMessage);
       }
     } catch (error) {
       console.error('Error adding need:', error);
-      alert('Failed to add need');
+      toast.error(error.message || 'Failed to add need');
     }
   };
 
@@ -191,12 +197,15 @@ const ManageNGOProfilePage = () => {
       if (response.ok) {
         const data = await response.json();
         setProfile(data);
+        toast.success('Need deleted successfully!');
       } else {
-        throw new Error('Failed to delete need');
+        const errorMessage = 'Failed to delete need';
+        toast.error(errorMessage);
+        throw new Error(errorMessage);
       }
     } catch (error) {
       console.error('Error deleting need:', error);
-      alert('Failed to delete need');
+      toast.error(error.message || 'Failed to delete need');
     }
   };
 

@@ -110,7 +110,7 @@ const CreateDonationPage = () => {
       });
       
       if (response.data.success) {
-        toast.success('Donation created successfully! NGOs can now browse and claim your donation.');
+        toast.success('Donation created successfully!');
         navigate('/browse'); // Redirect to browse page instead of dashboard
       }
     } catch (error) {
