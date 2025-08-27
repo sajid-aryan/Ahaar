@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
 import { ArrowLeft, MapPin, Clock, Package, AlertCircle, Upload, X } from 'lucide-react';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 import { useAuthStore } from '../store/authStore';
 
 const CreateDonationPage = () => {
@@ -109,11 +110,14 @@ const CreateDonationPage = () => {
       });
       
       if (response.data.success) {
+        toast.success('Donation created successfully! NGOs can now browse and claim your donation.');
         navigate('/browse'); // Redirect to browse page instead of dashboard
       }
     } catch (error) {
       console.error('Error creating donation:', error);
-      setError(error.response?.data?.message || 'Failed to create donation');
+      const errorMessage = error.response?.data?.message || 'Failed to create donation';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
