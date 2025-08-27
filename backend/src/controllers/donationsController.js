@@ -154,6 +154,14 @@ export async function claimDonation(req, res) {
       });
     }
     
+    // Check if the NGO is trying to claim their own donation
+    if (donation.donorId.toString() === claimerId.toString()) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'You cannot claim your own donation' 
+      });
+    }
+    
     donation.status = 'claimed';
     donation.claimerId = claimerId;
     donation.claimerName = claimerName;

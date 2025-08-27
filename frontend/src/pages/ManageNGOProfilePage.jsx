@@ -44,13 +44,17 @@ const ManageNGOProfilePage = () => {
 
   const fetchProfile = async () => {
     try {
+      console.log('Fetching profile for user:', user);
       const response = await fetch('http://localhost:3004/api/ngo-profiles/my-profile', {
         method: 'GET',
         credentials: 'include',
       });
 
+      console.log('Response status:', response.status);
+      
       if (response.ok) {
         const data = await response.json();
+        console.log('Profile data received:', data);
         setProfile(data);
         setProfileForm({
           organizationName: data.organizationName || '',
@@ -64,10 +68,13 @@ const ManageNGOProfilePage = () => {
         });
       } else if (response.status === 404) {
         // No profile exists yet
+        console.log('No profile found - 404');
         setProfile(null);
         setEditMode(true);
       } else {
-        throw new Error('Failed to fetch profile');
+        const errorData = await response.json();
+        console.log('Error response:', errorData);
+        throw new Error(errorData.message || 'Failed to fetch profile');
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -106,12 +113,26 @@ const ManageNGOProfilePage = () => {
 
   const handleSaveProfile = async () => {
     setSaving(true);
+    setError(''); // Clear any existing errors
+    
+    // Validate required fields
+    if (!profileForm.organizationName || !profileForm.description || !profileForm.location) {
+      const errorMessage = 'Please fill in all required fields (Organization Name, Description, Location)';
+      setError(errorMessage);
+      toast.error(errorMessage);
+      setSaving(false);
+      return;
+    }
+
     try {
       const url = profile 
         ? `http://localhost:3004/api/ngo-profiles/${profile._id}`
         : 'http://localhost:3004/api/ngo-profiles';
       
       const method = profile ? 'PUT' : 'POST';
+
+      console.log('Saving profile with data:', profileForm);
+      console.log('URL:', url, 'Method:', method);
 
       const response = await fetch(url, {
         method,
@@ -122,14 +143,18 @@ const ManageNGOProfilePage = () => {
         body: JSON.stringify(profileForm),
       });
 
+      console.log('Response status:', response.status);
+
       if (response.ok) {
         const data = await response.json();
+        console.log('Profile saved successfully:', data);
         setProfile(data);
         setEditMode(false);
         setError('');
-        toast.success('Profile updated successfully!');
+        toast.success('Profile saved successfully! Your changes have been saved.');
       } else {
         const errorData = await response.json();
+        console.error('Backend error response:', errorData);
         const errorMessage = errorData.message || 'Failed to save profile';
         setError(errorMessage);
         toast.error(errorMessage);

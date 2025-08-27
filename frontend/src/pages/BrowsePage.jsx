@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from 'react-router';
-import { ArrowLeft, MapPin, Package, Heart } from 'lucide-react';
+import { ArrowLeft, MapPin, Package, Heart, Clock } from 'lucide-react';
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
+import { formatDate } from '../../utils/date';
 import toast from 'react-hot-toast';
 
 const BrowsePage = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
+  
   const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -34,32 +36,28 @@ const BrowsePage = () => {
 
   const filteredDonations = donations
     .filter(donation => {
+      // Filter out expired, claimed, and completed donations
+      if (donation.status === 'expired' || donation.status === 'claimed' || donation.status === 'completed') {
+        return false;
+      }
+      
+      // Check if donation has expired based on expiry date
+      if (donation.expiryDate) {
+        const expiryDate = new Date(donation.expiryDate);
+        const currentDate = new Date();
+        if (expiryDate < currentDate) {
+          return false;
+        }
+      }
+      
+      // Apply category filter
       if (filter === 'all') return true;
       return donation.category === filter;
     })
     .sort((a, b) => {
-      // First, sort by status: available donations first, then claimed/completed/expired
-      const statusPriority = {
-        'available': 0,
-        'claimed': 1,
-        'completed': 2,
-        'expired': 3
-      };
-      
-      const aPriority = statusPriority[a.status] || 4;
-      const bPriority = statusPriority[b.status] || 4;
-      
-      if (aPriority !== bPriority) {
-        return aPriority - bPriority;
-      }
-      
-      // If same status, sort by creation date (newest first)
+      // Sort by creation date (newest first)
       return new Date(b.createdAt) - new Date(a.createdAt);
     });
-
-  // Debug logging to see the sorting in action
-  console.log('Donations before sorting:', donations.map(d => ({ title: d.title, status: d.status })));
-  console.log('Donations after sorting:', filteredDonations.map(d => ({ title: d.title, status: d.status })));
 
   const categories = ['all', 'food', 'clothing', 'medical', 'other'];
 
@@ -71,7 +69,7 @@ const BrowsePage = () => {
 
     // Check if the donation was created by the same NGO
     const donation = donations.find(d => d._id === donationId);
-    if (donation && donation.donorId === user._id) {
+    if (donation && String(donation.donorId) === String(user._id)) {
       toast.error('You cannot claim your own donation');
       return;
     }
@@ -208,12 +206,17 @@ const BrowsePage = () => {
                   
                   <div className="flex gap-2 mb-2">
                     <div className="badge badge-primary">{donation.category}</div>
-                    <div className={`badge ${donation.status === 'available' ? 'badge-success' : 'badge-warning'}`}>
-                      {donation.status}
-                    </div>
                   </div>
                   
                   <p className="text-sm text-gray-600 line-clamp-3">{donation.description}</p>
+                  
+                  {/* Expiry Date */}
+                  {donation.expiryDate && (
+                    <div className="flex items-center gap-1 text-sm text-orange-600 mt-2">
+                      <Clock className="w-4 h-4" />
+                      <span>Expires: {formatDate(donation.expiryDate)}</span>
+                    </div>
+                  )}
                   
                   <div className="flex justify-between items-center mt-4">
                     <span className="text-lg font-semibold">
@@ -232,11 +235,6 @@ const BrowsePage = () => {
                   <div className="card-actions justify-between mt-4">
                     <div className="text-xs text-gray-500">
                       By {donation.donorName} ({donation.donorType})
-                      {donation.status === 'claimed' && donation.claimerName && (
-                        <div className="text-orange-600 font-medium">
-                          Claimed by {donation.claimerName}
-                        </div>
-                      )}
                     </div>
                     <div className="flex gap-2 items-center">
                       {/* Like Button and Count */}
@@ -280,22 +278,27 @@ const BrowsePage = () => {
                         )}
                       </div>
                       
-                      {/* Claim Button for NGOs - moved to the right */}
-                      {donation.status === 'available' && user?.userType === 'ngo' && donation.donorId !== user._id && (
-                        <button 
-                          className={`btn btn-warning btn-sm ${claimingId === donation._id ? 'loading' : ''}`}
-                          onClick={() => handleClaimDonation(donation._id)}
-                          disabled={claimingId === donation._id}
-                        >
-                          {claimingId === donation._id ? 'Claiming...' : 'Claim'}
-                        </button>
-                      )}
-                      
-                      {/* Show when donation is claimed */}
-                      {donation.status === 'claimed' && (
-                        <div className="btn btn-disabled btn-sm">
-                          Already Claimed
-                        </div>
+                      {/* Claim Button for NGOs */}
+                      {user?.userType === 'ngo' && user?._id && (
+                        <>
+                          {String(donation.donorId) !== String(user._id) ? (
+                            <button 
+                              className={`btn btn-warning btn-sm ${claimingId === donation._id ? 'loading' : ''}`}
+                              onClick={() => handleClaimDonation(donation._id)}
+                              disabled={claimingId === donation._id}
+                            >
+                              {claimingId === donation._id ? 'Claiming...' : 'Claim'}
+                            </button>
+                          ) : (
+                            <button 
+                              className="btn btn-disabled btn-sm"
+                              disabled
+                              title="You cannot claim your own donation"
+                            >
+                              Your Donation
+                            </button>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
