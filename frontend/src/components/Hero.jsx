@@ -10,25 +10,27 @@ const Hero = () => {
       <p className="py-10 text-lg font-medium font-sans text-neutral-600">
         A platform where restaurants and individuals donate surplus food, clothes, and essentials to NGOs helping those in need.
       </p>
-      <div className="flex justify-center gap-10">
+      <div className="flex justify-center gap-6 flex-wrap">
         {isAuthenticated ? (
           <>
             {user?.userType === 'ngo' ? (
               <>
                 <Link to="/browse" className="btn btn-primary transition duration-300 ease-in-out hover:scale-105 hover:shadow-lg transform">Browse & Claim Donations</Link>
                 <Link to="/claimed-donations" className="btn btn-outline btn-success transition duration-300 ease-in-out hover:scale-105 hover:shadow-lg transform">My Claimed Donations</Link>
+                <Link to="/manage-profile" className="btn btn-outline btn-secondary transition duration-300 ease-in-out hover:scale-105 hover:shadow-lg transform">Manage Profile</Link>
               </>
             ) : (
               <>
                 <Link to="/create-donation" className="btn btn-success transition duration-300 ease-in-out hover:scale-105 hover:shadow-lg transform">Start Donating</Link>
                 <Link to="/browse" className="btn btn-outline btn-success transition duration-300 ease-in-out hover:scale-105 hover:shadow-lg transform">Browse Donations</Link>
+                <Link to="/ngo-profiles" className="btn btn-outline btn-info transition duration-300 ease-in-out hover:scale-105 hover:shadow-lg transform">See How You Can Help</Link>
               </>
             )}
           </>
         ) : (
           <>
             <Link to="/signup" className="btn btn-success transition duration-300 ease-in-out hover:scale-105 hover:shadow-lg transform">Get Started</Link>
-            {/* <Link to="/browse" className="btn btn-outline btn-accent">Browse Donations</Link> */}
+            <Link to="/ngo-profiles" className="btn btn-outline btn-info transition duration-300 ease-in-out hover:scale-105 hover:shadow-lg transform">See How You Can Help</Link>
           </>
         )}
       </div>

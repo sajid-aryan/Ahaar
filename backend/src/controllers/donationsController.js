@@ -3,7 +3,19 @@ import Donation from '../models/Donation.js';
 // Get all donations (for browse page)
 export async function getAllDonations(req, res) {
   try {
-    const donations = await Donation.find({ status: { $ne: 'expired' } })
+    // First, update any expired donations
+    await Donation.updateMany(
+      {
+        expiryDate: { $lte: new Date() },
+        status: 'available'
+      },
+      {
+        $set: { status: 'expired' }
+      }
+    );
+
+    // Then fetch only available donations (exclude claimed, completed, and expired)
+    const donations = await Donation.find({ status: 'available' })
       .sort({ createdAt: -1 })
       .populate('donorId', 'name userType')
       .populate('claimerId', 'name userType');
@@ -61,6 +73,20 @@ export async function createDonation(req, res) {
 export async function getDonationsByUser(req, res) {
   try {
     const { userId } = req.params;
+    
+    // First, update any expired donations
+    await Donation.updateMany(
+      {
+        donorId: userId,
+        expiryDate: { $lte: new Date() },
+        status: 'available'
+      },
+      {
+        $set: { status: 'expired' }
+      }
+    );
+
+    // Then fetch all donations by this user
     const donations = await Donation.find({ donorId: userId })
       .sort({ createdAt: -1 })
       .populate('claimerId', 'name userType');

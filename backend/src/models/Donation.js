@@ -29,13 +29,8 @@ const donationSchema = new mongoose.Schema({
         trim: true
     },
     expiryDate: {
-        type: Date,
-        validate: {
-            validator: function(value) {
-                return !value || value > new Date();
-            },
-            message: 'Expiry date must be in the future'
-        }
+        type: Date
+        // Removed validation to allow testing with past dates
     },
     pickupInstructions: {
         type: String,

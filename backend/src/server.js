@@ -6,7 +6,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import authRoutes from "./routes/auth.route.js";
 import donationsRoutes from './routes/donationsRoutes.js';
+import ngoProfileRoutes from './routes/ngoProfileRoutes.js';
 import { connectDB } from './config/db.js';
+import { startExpiryChecker } from './utils/cronJobs.js';
 
 
 dotenv.config();
@@ -38,11 +40,14 @@ app.use((req, res, next) => {
 });
 
 app.use("/api/donations", donationsRoutes);
+app.use("/api/ngo-profiles", ngoProfileRoutes);
 
 // Dashboard and donation management system
 connectDB().then(() => {
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
+    // Start the expiry checker after server starts
+    startExpiryChecker();
   });
 });
 

@@ -6,8 +6,12 @@ import BrowsePage from './pages/BrowsePage.jsx'
 import ClaimedDonationsPage from './pages/ClaimedDonationsPage.jsx'
 import MyDonationsPage from './pages/MyDonationsPage.jsx'
 import About from './pages/About.jsx'
+import NGOProfilesPage from './pages/NGOProfilesPage.jsx'
+import NGOProfileDetailPage from './pages/NGOProfileDetailPage.jsx'
+import ManageNGOProfilePage from './pages/ManageNGOProfilePage.jsx'
 import Footer from './components/Footer.jsx'
 import Navbar from './components/Navbar.jsx'
+import Chatbot from './components/Chatbot.jsx'
 import SignUpPage from "./pages/SignUpPage";
 import LoginPage from "./pages/LoginPage";
 import LoadingSpinner from "./components/LoadingSpinner";
@@ -55,6 +59,16 @@ function App() {
 						element={<Welcome />}
 					/>
 					<Route path="/about" element={<About />} />
+					<Route path="/ngo-profiles" element={<NGOProfilesPage />} />
+					<Route path="/ngo-profile/:id" element={<NGOProfileDetailPage />} />
+					<Route 
+						path="/manage-profile" 
+						element={
+							<ProtectedRoute>
+								<ManageNGOProfilePage />
+							</ProtectedRoute>
+						} 
+					/>
 					<Route 
 						path="/browse" 
 						element={
@@ -108,6 +122,7 @@ function App() {
 				</Routes>
 			</main>
 			<Footer />
+			<Chatbot />
 			<Toaster />
 		</div>
 	);

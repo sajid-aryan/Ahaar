@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Info, Menu, Home, UserPlus, LogIn, LogOut, User, History, Package } from 'lucide-react';
+import { Info, Menu, Home, UserPlus, LogIn, LogOut, User, History, Package, Building2, Settings } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 
 const Navbar = () => {
@@ -26,15 +26,20 @@ const Navbar = () => {
           <ul className="menu dropdown-content bg-neutral-50 rounded-box z-[1] w-52 p-2 shadow">
             <li><Link to="/" className="flex items-center gap-2"><Home /> Home</Link></li>
             <li><Link to="/about" className="flex items-center gap-2"><Info /> About</Link></li>
+            <li><Link to="/ngo-profiles" className="flex items-center gap-2"><Building2 /> NGO Profiles</Link></li>
             {isAuthenticated ? (
               <>
                 <li><Link to="/browse" className="flex items-center gap-2"><Home /> Browse Donations</Link></li>
                 <li><Link to="/create-donation" className="flex items-center gap-2"><UserPlus /> Create Donation</Link></li>
                 <li><Link to="/my-donations" className="flex items-center gap-2"><Package /> My Donations</Link></li>
-                {user?.userType === 'ngo' && (
-                  <li><Link to="/claimed-donations" className="flex items-center gap-2"><History /> My Claimed Donations</Link></li>
+                {user?.userType === 'ngo' ? (
+                  <>
+                    <li><Link to="/claimed-donations" className="flex items-center gap-2"><History /> My Claimed Donations</Link></li>
+                    <li><Link to="/manage-profile" className="flex items-center gap-2"><Settings /> {user?.name} - Manage Profile</Link></li>
+                  </>
+                ) : (
+                  <li><a className="flex items-center gap-2"><User /> {user?.name} ({user?.userType})</a></li>
                 )}
-                <li><a className="flex items-center gap-2"><User /> {user?.name} ({user?.userType})</a></li>
                 <li><button onClick={handleLogout} className="flex items-center gap-2"><LogOut /> Logout</button></li>
               </>
             ) : (
