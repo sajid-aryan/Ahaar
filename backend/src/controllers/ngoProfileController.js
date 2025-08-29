@@ -403,6 +403,15 @@ export async function makeMoneyDonation(req, res) {
 
     console.log('NGO profile found:', profile.organizationName);
 
+    // Check if user is trying to donate to their own profile
+    if (profile.ngoId.toString() === userId.toString()) {
+      console.log('User attempting to donate to their own profile');
+      return res.status(400).json({
+        success: false,
+        message: 'You cannot donate to yourself'
+      });
+    }
+
     // Find the specific need
     const need = profile.needs.id(needId);
     if (!need) {

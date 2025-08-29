@@ -79,6 +79,12 @@ const NGOProfileDetailPage = () => {
         return;
       }
       
+      // Check if user is trying to donate to their own profile
+      if (user._id === ngoProfile.userId) {
+        toast.error('You cannot donate to yourself');
+        return;
+      }
+      
       setSelectedNeed(need);
       setShowDonationForm(true);
       setDonationForm({

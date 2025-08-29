@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from 'react-router';
-import { ArrowLeft, MapPin, Package, Heart, Clock } from 'lucide-react';
+import { ArrowLeft, MapPin, Package, Heart, Clock, Phone, Info } from 'lucide-react';
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 import { formatDate } from '../../utils/date';
@@ -210,6 +210,24 @@ const BrowsePage = () => {
                   
                   <p className="text-sm text-gray-600 line-clamp-3">{donation.description}</p>
                   
+                  {/* Pickup Instructions - Only visible to NGOs */}
+                  {user?.userType === 'ngo' && donation.pickupInstructions && (
+                    <div className="flex items-start gap-1 text-sm text-blue-600 mt-2">
+                      <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <span className="font-medium">Pickup:</span> {donation.pickupInstructions}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Contact Phone - Only visible to NGOs */}
+                  {user?.userType === 'ngo' && donation.contactPhone && (
+                    <div className="flex items-center gap-1 text-sm text-green-600 mt-2">
+                      <Phone className="w-4 h-4" />
+                      <span>Contact: {donation.contactPhone}</span>
+                    </div>
+                  )}
+                  
                   {/* Expiry Date */}
                   {donation.expiryDate && (
                     <div className="flex items-center gap-1 text-sm text-orange-600 mt-2">
@@ -218,17 +236,20 @@ const BrowsePage = () => {
                     </div>
                   )}
                   
-                  <div className="flex justify-between items-center mt-4">
-                    <span className="text-lg font-semibold">
-                      {donation.quantity}
-                    </span>
-                    <div className="flex items-center gap-2">
+                  <div className="flex justify-between items-start mt-4">
+                    <div className="flex flex-col">
+                      <span className="text-lg font-semibold mb-1">
+                        {donation.quantity}
+                      </span>
                       {donation.location && (
-                        <span className="text-sm text-gray-500">
-                          <MapPin className="w-4 h-4 inline mr-1" />
+                        <span className="text-sm text-gray-500 flex items-center">
+                          <MapPin className="w-4 h-4 mr-1" />
                           {donation.location}
                         </span>
                       )}
+                    </div>
+                    <div className="flex-1">
+                      {/* Right side content can go here if needed */}
                     </div>
                   </div>
                   
