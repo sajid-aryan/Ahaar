@@ -7,7 +7,7 @@ import { useAuthStore } from '../store/authStore';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const ManageNGOProfilePage = () => {
-  const { user } = useAuthStore();
+  const { user, updateUserProfile } = useAuthStore();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -27,6 +27,11 @@ const ManageNGOProfilePage = () => {
     }
   });
 
+  const [userForm, setUserForm] = useState({
+    name: '',
+    email: ''
+  });
+
   const [newNeed, setNewNeed] = useState({
     type: 'food',
     description: '',
@@ -36,6 +41,11 @@ const ManageNGOProfilePage = () => {
   useEffect(() => {
     if (user && user.userType === 'ngo') {
       fetchProfile();
+      // Initialize user form with current user data
+      setUserForm({
+        name: user.name || '',
+        email: user.email || ''
+      });
     } else {
       setError('Access denied. Only NGOs can manage profiles.');
       setLoading(false);
@@ -103,6 +113,14 @@ const ManageNGOProfilePage = () => {
     }
   };
 
+  const handleUserInputChange = (e) => {
+    const { name, value } = e.target;
+    setUserForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   const handleNeedChange = (e) => {
     const { name, value } = e.target;
     setNewNeed(prev => ({
@@ -125,6 +143,12 @@ const ManageNGOProfilePage = () => {
     }
 
     try {
+      // Save user profile (name and email) first
+      if (userForm.name !== user.name || userForm.email !== user.email) {
+        await handleSaveUserProfile();
+      }
+
+      // Then save NGO profile
       const url = profile 
         ? `http://localhost:3004/api/ngo-profiles/${profile._id}`
         : 'http://localhost:3004/api/ngo-profiles';
@@ -167,6 +191,32 @@ const ManageNGOProfilePage = () => {
       toast.error(errorMessage);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleSaveUserProfile = async () => {
+    try {
+      const response = await fetch('http://localhost:3004/api/user-profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(userForm),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Update user in auth store
+        updateUserProfile(data.user);
+        console.log('User profile updated successfully');
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update user profile');
+      }
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+      throw error; // Re-throw to be caught by parent function
     }
   };
 
@@ -297,12 +347,55 @@ const ManageNGOProfilePage = () => {
           </div>
 
           <div className="p-6">
-            {/* Profile Form */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Organization Name *
-                </label>
+            {/* User Profile Section */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">User Account Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-blue-50 rounded-lg">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    User Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={userForm.name}
+                    onChange={handleUserInputChange}
+                    disabled={!editMode}
+                    required
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                    placeholder="Enter your name"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">This is your account name, different from organization name</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    User Email *
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={userForm.email}
+                    onChange={handleUserInputChange}
+                    disabled={!editMode}
+                    required
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                    placeholder="Enter your email address"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Your account email for login</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Organization Profile Section */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Organization Information</h3>
+              {/* Profile Form */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Organization Name *
+                  </label>
                 <input
                   type="text"
                   name="organizationName"
@@ -390,6 +483,7 @@ const ManageNGOProfilePage = () => {
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-100"
                   placeholder="Enter website URL"
                 />
+              </div>
               </div>
             </div>
 

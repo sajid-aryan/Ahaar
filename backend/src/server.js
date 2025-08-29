@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import authRoutes from "./routes/auth.route.js";
 import donationsRoutes from './routes/donationsRoutes.js';
 import ngoProfileRoutes from './routes/ngoProfileRoutes.js';
+import userProfileRoutes from './routes/userProfileRoutes.js';
 import { connectDB } from './config/db.js';
 import { startExpiryChecker } from './utils/cronJobs.js';
 
@@ -18,7 +19,7 @@ const __dirname = path.dirname(__filename);
 
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3004;
 
 // Middleware
 
@@ -41,6 +42,7 @@ app.use((req, res, next) => {
 
 app.use("/api/donations", donationsRoutes);
 app.use("/api/ngo-profiles", ngoProfileRoutes);
+app.use("/api/user-profile", userProfileRoutes);
 
 // Dashboard and donation management system
 connectDB().then(() => {

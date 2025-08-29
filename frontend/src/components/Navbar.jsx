@@ -71,7 +71,9 @@ const Navbar = () => {
                       <li><Link to="/manage-profile" onClick={closeDropdown} className="flex items-center gap-2"><Settings /> {user?.name} - Manage Profile</Link></li>
                     </>
                   ) : (
-                    <li><a className="flex items-center gap-2"><User /> {user?.name} ({user?.userType})</a></li>
+                    <>
+                      <li><Link to="/manage-user-profile" onClick={closeDropdown} className="flex items-center gap-2"><Settings /> {user?.name} - Manage Profile</Link></li>
+                    </>
                   )}
                   <li><button onClick={handleLogout} className="flex items-center gap-2"><LogOut /> Logout</button></li>
                 </>

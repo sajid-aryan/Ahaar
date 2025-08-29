@@ -15,6 +15,10 @@ const userSchema = new mongoose.Schema(
 			type: String,
 			required: true,
 		},
+		phone: {
+			type: String,
+			trim: true,
+		},
 		userType: {
 			type: String,
 			required: true,
@@ -25,8 +29,17 @@ const userSchema = new mongoose.Schema(
 			type: Date,
 			default: Date.now,
 		},
+		donationsCount: {
+			type: Number,
+			default: 0,
+		},
+		totalMoneyDonated: {
+			type: Number,
+			default: 0,
+		},
 	},
 	{ timestamps: true }
 );
 
 export const User = mongoose.model("User", userSchema);
+export default User;

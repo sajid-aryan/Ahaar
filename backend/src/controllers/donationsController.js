@@ -1,4 +1,5 @@
 import Donation from '../models/Donation.js';
+import User from '../models/user.model.js';
 
 // Get all donations (for browse page)
 export async function getAllDonations(req, res) {
@@ -53,6 +54,9 @@ export async function createDonation(req, res) {
 
     const newDonation = new Donation(donationData);
     await newDonation.save();
+    
+    // Note: We no longer increment donationsCount here
+    // It will be incremented when the donation is claimed
     
     res.status(201).json({ 
       success: true, 
@@ -168,6 +172,14 @@ export async function claimDonation(req, res) {
     donation.claimedAt = new Date();
     
     await donation.save();
+    
+    // Increment the donor's donations count when their donation is claimed
+    if (donation.donorId) {
+      await User.findByIdAndUpdate(
+        donation.donorId,
+        { $inc: { donationsCount: 1 } }
+      );
+    }
     
     res.status(200).json({ 
       success: true, 

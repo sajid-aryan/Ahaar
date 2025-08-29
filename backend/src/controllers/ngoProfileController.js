@@ -463,6 +463,13 @@ export async function makeMoneyDonation(req, res) {
     await profile.save();
     console.log('Profile updated with new donation amounts');
 
+    // Update user's total money donated
+    await User.findByIdAndUpdate(
+      userId,
+      { $inc: { totalMoneyDonated: parseFloat(amount) } }
+    );
+    console.log('User total money donated updated');
+
     res.status(200).json({
       success: true,
       message: 'Donation successful!',

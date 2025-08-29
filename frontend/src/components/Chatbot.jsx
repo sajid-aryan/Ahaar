@@ -55,20 +55,28 @@ const Chatbot = () => {
       return "To create an account: 1) Click 'Sign Up' in the top right, 2) Choose 'Donor' or 'NGO', 3) Fill in your details, 4) Verify your email. NGOs can create profiles to receive donations.";
     }
     
+    if (lowerMessage.includes('profile') || lowerMessage.includes('manage profile')) {
+      return "🔧 **Profile Management:** \n\n**For NGOs:** Click your name → 'Manage Profile' to update organization details, add needs, and manage donations received. \n\n**For Individual/Restaurant Users:** Click your name → 'Manage Profile' to update personal info, add phone number, and view your donation statistics including total donations made and money donated. \n\n**Profile Stats:** Track your donation count and total money donated to see your impact!";
+    }
+    
     if (lowerMessage.includes('ngo') && (lowerMessage.includes('profile') || lowerMessage.includes('create'))) {
       return "NGOs can create profiles by: 1) Signing up as an NGO, 2) Going to 'Manage Profile', 3) Adding organization details, logo, and current needs. Your profile will be visible to donors.";
+    }
+    
+    if (lowerMessage.includes('stats') || lowerMessage.includes('statistics') || lowerMessage.includes('track donations')) {
+      return "📊 **Donation Statistics:** Once logged in, go to 'Manage Profile' to view: \n• Total donations made (counted when claimed by NGOs) \n• Total money donated \n• Member since date \n• Last login \n\nYour donation count increases when NGOs claim your donations, showing real impact!";
     }
     
     if (lowerMessage.includes('payment') || lowerMessage.includes('pay')) {
       return "We accept Credit Cards, Debit Cards, bKash, and Bank Transfers. All payments are processed securely. You'll receive a transaction ID after successful donation.";
     }
     
-    if (lowerMessage.includes('track') || lowerMessage.includes('history')) {
-      return "To track your donations: 1) Log in to your account, 2) Go to 'My Donations' to see your donation history and status updates.";
+    if (lowerMessage.includes('track') || lowerMessage.includes('history') || lowerMessage.includes('my donations')) {
+      return "📋 **Track Your Donations:** \n1) Log in to your account \n2) Click 'My Donations' to see donation history \n3) View donation status updates \n4) Use 'View My Donations' button on your profile page \n\nYou can also see your overall donation statistics in your profile!";
     }
     
     if (lowerMessage.includes('help') || lowerMessage.includes('support')) {
-      return "I'm here to help! You can ask me about: donations, creating accounts, NGO profiles, payments, tracking donations, or any other questions about Ahaar.";
+      return "I'm here to help! You can ask me about: donations, creating accounts, NGO profiles, payments, tracking donations, profile management, donation statistics, or any other questions about Ahaar.";
     }
     
     if (lowerMessage.includes('security') || lowerMessage.includes('safe')) {
@@ -80,7 +88,7 @@ const Chatbot = () => {
     }
     
     // Default response
-    return "I'm not sure about that specific question. You can ask me about donations, creating accounts, NGO profiles, payments, or contact our support team for more detailed assistance.";
+    return "I'm not sure about that specific question. You can ask me about donations, creating accounts, NGO profiles, payments, profile management, donation statistics, or contact our support team for more detailed assistance.";
   };
 
   const handleSendMessage = async () => {

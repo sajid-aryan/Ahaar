@@ -58,5 +58,9 @@ export const useAuthStore = create((set) => ({
 			set({ error: null, isCheckingAuth: false, isAuthenticated: false });
 		}
 	},
+
+	updateUserProfile: (updatedUser) => {
+		set({ user: updatedUser });
+	},
 	
 }));
