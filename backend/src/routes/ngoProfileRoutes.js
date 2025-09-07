@@ -4,7 +4,6 @@ import { verifyToken } from '../middleware/verifyToken.js';
 import {
   getAllNGOProfiles,
   getNGOProfileById,
-  getNGOProfileByUserId,
   getMyProfile,
   createNGOProfile,
   updateNGOProfile,
@@ -20,7 +19,6 @@ const router = express.Router();
 // Public routes
 router.get('/public', getAllNGOProfiles);
 router.get('/public/:id', getNGOProfileById);
-router.get('/user/:ngoId', getNGOProfileByUserId);
 
 // Protected routes
 router.get('/my-profile', verifyToken, getMyProfile);

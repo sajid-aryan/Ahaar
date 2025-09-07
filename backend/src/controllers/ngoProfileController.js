@@ -52,33 +52,7 @@ export async function getNGOProfileById(req, res) {
   }
 }
 
-// Get NGO profile by NGO user ID
-export async function getNGOProfileByUserId(req, res) {
-  try {
-    const { ngoId } = req.params;
-    const profile = await NGOProfile.findOne({ ngoId })
-      .populate('ngoId', 'name email');
-    
-    if (!profile) {
-      return res.status(404).json({
-        success: false,
-        message: 'NGO profile not found'
-      });
-    }
-    
-    res.status(200).json({
-      success: true,
-      profile
-    });
-  } catch (error) {
-    console.error('Error fetching NGO profile:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching NGO profile',
-      error: error.message
-    });
-  }
-}
+
 
 // Get my NGO profile (for authenticated NGO user)
 export async function getMyProfile(req, res) {
