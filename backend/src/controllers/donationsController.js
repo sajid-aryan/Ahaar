@@ -54,10 +54,7 @@ export async function createDonation(req, res) {
 
     const newDonation = new Donation(donationData);
     await newDonation.save();
-    
-    // Note: We no longer increment donationsCount here
-    // It will be incremented when the donation is claimed
-    
+      
     res.status(201).json({ 
       success: true, 
       message: 'Donation created successfully',

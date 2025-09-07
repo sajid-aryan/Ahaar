@@ -1,6 +1,6 @@
 import Donation from '../models/Donation.js';
 
-// Function to check and update expired donations
+// Function for checking and updating expired donations
 export const checkExpiredDonations = async () => {
   try {
     const result = await Donation.updateMany(
@@ -21,12 +21,12 @@ export const checkExpiredDonations = async () => {
   }
 };
 
-// Start periodic checks for expired donations (every minute)
+// Start checking every minute expired donations 
 export const startExpiryChecker = () => {
   // Check immediately on startup
   checkExpiredDonations();
   
-  // Then check every minute
+  // Check every minute
   setInterval(checkExpiredDonations, 60000); // 60000ms = 1 minute
   
   console.log('Donation expiry checker started - checking every minute');
