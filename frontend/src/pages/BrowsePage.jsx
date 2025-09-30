@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from 'react-router';
+import { motion } from 'framer-motion';
 import { ArrowLeft, MapPin, Package, Heart, Clock, Phone, Info, Star } from 'lucide-react';
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
@@ -173,15 +174,176 @@ const BrowsePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-slate-100 to-green-50">
+    <motion.div 
+      className="relative min-h-screen bg-gradient-to-br from-pink-50 via-slate-100 to-green-50 overflow-hidden"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6 }}
+    >
+      {/* Ultra-Enhanced Background Effects */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {/* Dynamic Gradient Orbs */}
+        <motion.div
+          className="absolute top-10 right-10 w-60 h-60 opacity-30"
+          style={{
+            background: 'conic-gradient(from 0deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3, #ff6b6b)',
+            borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
+            filter: 'blur(40px)',
+          }}
+          animate={{ 
+            rotate: [0, 360],
+            borderRadius: [
+              '60% 40% 30% 70% / 60% 30% 70% 40%',
+              '40% 60% 70% 30% / 40% 70% 30% 60%',
+              '30% 70% 40% 60% / 70% 40% 60% 30%',
+              '60% 40% 30% 70% / 60% 30% 70% 40%'
+            ]
+          }}
+          transition={{ 
+            duration: 20, 
+            repeat: Infinity,
+            ease: "linear"
+          }}
+        />
+        
+        <motion.div
+          className="absolute bottom-20 left-10 w-80 h-80 opacity-25"
+          style={{
+            background: 'radial-gradient(circle, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+            borderRadius: '30% 70% 40% 60% / 50% 60% 40% 50%',
+            filter: 'blur(50px)',
+          }}
+          animate={{ 
+            scale: [1, 1.2, 0.8, 1],
+            rotate: [0, -360],
+            borderRadius: [
+              '30% 70% 40% 60% / 50% 60% 40% 50%',
+              '70% 30% 60% 40% / 30% 50% 60% 50%',
+              '40% 60% 30% 70% / 60% 40% 50% 60%',
+              '30% 70% 40% 60% / 50% 60% 40% 50%'
+            ]
+          }}
+          transition={{ 
+            duration: 25, 
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+
+        {/* Floating Food Icons */}
+        {['🍎', '🥖', '🥕', '🍇', '🥑', '🍊', '🥬', '🍌'].map((icon, index) => (
+          <motion.div
+            key={index}
+            className="absolute text-6xl opacity-15"
+            style={{
+              left: `${10 + (index * 10)}%`,
+              top: `${20 + (index * 8)}%`,
+            }}
+            animate={{ 
+              y: [0, -30, 0],
+              rotate: [0, 360],
+              scale: [1, 1.2, 1],
+            }}
+            transition={{ 
+              duration: 8 + index * 2, 
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: index * 0.5
+            }}
+          >
+            {icon}
+          </motion.div>
+        ))}
+
+        {/* Geometric Shapes */}
+        <motion.div
+          className="absolute top-1/4 right-1/4 w-32 h-32 opacity-20"
+          style={{
+            background: 'linear-gradient(45deg, #ff9a9e, #fecfef)',
+            clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
+          }}
+          animate={{ 
+            rotate: [0, 180, 360],
+            scale: [1, 1.3, 1],
+          }}
+          transition={{ 
+            duration: 12, 
+            repeat: Infinity,
+            ease: "linear"
+          }}
+        />
+
+        <motion.div
+          className="absolute bottom-1/3 right-1/3 w-24 h-24 opacity-25"
+          style={{
+            background: 'linear-gradient(135deg, #667eea, #764ba2)',
+            borderRadius: '50%',
+          }}
+          animate={{ 
+            x: [0, 50, -50, 0],
+            y: [0, -30, 30, 0],
+            scale: [1, 1.5, 0.8, 1],
+          }}
+          transition={{ 
+            duration: 15, 
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+
+        {/* Sparkle Effects */}
+        {Array.from({ length: 12 }).map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-2 h-2 bg-yellow-300 rounded-full opacity-60"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              scale: [0, 1, 0],
+              opacity: [0.6, 1, 0.6],
+              rotate: [0, 180, 360],
+            }}
+            transition={{
+              duration: 3 + Math.random() * 2,
+              repeat: Infinity,
+              delay: Math.random() * 2,
+              ease: "easeInOut"
+            }}
+          />
+        ))}
+
+        {/* Mesh Gradient Overlay */}
+        <div 
+          className="absolute inset-0 opacity-30"
+          style={{
+            background: `
+              radial-gradient(circle at 20% 20%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+              radial-gradient(circle at 40% 60%, rgba(120, 219, 255, 0.3) 0%, transparent 50%)
+            `,
+            animation: 'aurora 15s ease-in-out infinite'
+          }}
+        />
+      </div>
+      
+      <div className="relative z-10">
       <div className="container mx-auto px-6 py-8">
-        <div className="flex justify-between items-center mb-8">
+        <motion.div 
+          className="flex justify-between items-center mb-8"
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
           <h1 className="text-3xl font-bold">Browse Donations</h1>
-          <Link to="/" className="btn btn-ghost">
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Back to Home
-          </Link>
-        </div>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Link to="/" className="btn btn-ghost">
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              Back to Home
+            </Link>
+          </motion.div>
+        </motion.div>
         
         {/* Filters */}
         <div className="flex flex-wrap justify-center gap-2 mb-8">
@@ -217,25 +379,76 @@ const BrowsePage = () => {
         )}
 
         {filteredDonations.length > 0 && !loading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredDonations.map((donation) => (
-              <div key={donation._id} className="card bg-base-100 shadow-xl">
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
+            {filteredDonations.map((donation, index) => (
+              <motion.div 
+                key={donation._id} 
+                className="group card bg-base-100/80 backdrop-blur-sm shadow-xl transition-all duration-200 glass-card relative overflow-hidden hover:shadow-2xl hover:-translate-y-1 hover:scale-[1.02]"
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ 
+                  duration: 0.5, 
+                  delay: index * 0.1 
+                }}
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255,255,255,0.3)',
+                }}
+              >
                 {donation.image && (
-                  <figure>
+                  <figure className="relative overflow-hidden">
                     <img 
                       src={`http://localhost:3004${donation.image}`}
                       alt={donation.title}
-                      className="h-48 w-full object-cover"
+                      className="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                    {/* Image Overlay Effect */}
+                    <div
+                      className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                     />
                   </figure>
                 )}
                 
-                <div className="card-body">
-                  <h2 className="card-title">{donation.title}</h2>
+                <motion.div className="card-body relative z-10">
+                  <motion.h2 
+                    className="card-title text-lg font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent"
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: index * 0.1 + 0.2 }}
+                  >
+                    {donation.title}
+                  </motion.h2>
                   
-                  <div className="flex gap-2 mb-2">
-                    <div className="badge badge-primary">{donation.category}</div>
-                  </div>
+                  <motion.div 
+                    className="flex gap-2 mb-3"
+                    initial={{ scale: 0, x: -20 }}
+                    animate={{ scale: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 + 0.3, duration: 0.4 }}
+                  >
+                    <motion.div 
+                      className={`badge text-white font-semibold shadow-lg backdrop-blur-sm border-0 px-3 py-2 ${
+                        donation.category === 'food' ? 'bg-gradient-to-r from-green-500 to-emerald-600' :
+                        donation.category === 'clothing' ? 'bg-gradient-to-r from-purple-500 to-pink-600' :
+                        donation.category === 'medical' ? 'bg-gradient-to-r from-blue-500 to-cyan-600' :
+                        'bg-gradient-to-r from-orange-500 to-red-600'
+                      } transition-all duration-200`}
+                      whileHover={{ 
+                        scale: 1.05, 
+                        boxShadow: "0 10px 25px rgba(0,0,0,0.2)" 
+                      }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <span className="text-xs font-bold uppercase tracking-wide">
+                        {donation.category}
+                      </span>
+                    </motion.div>
+                  </motion.div>
                   
                   <p className="text-sm text-gray-600 line-clamp-3">{donation.description}</p>
                   
@@ -284,27 +497,35 @@ const BrowsePage = () => {
                   
                   <div className="card-actions justify-between mt-4">
                     <div className="text-xs text-gray-500">
-                      <div className="flex items-center gap-2">
-                        <span>By </span>
-                        <Link 
-                          to={`/donor-profile/${donation.donorId._id}`}
-                          className="text-blue-600 hover:text-blue-800 font-medium hover:underline"
-                        >
-                          {donation.donorName}
-                        </Link>
-                        <span>({donation.donorType})</span>
-                        {donation.donorId.averageRating > 0 && (
-                          <div className="flex items-center gap-1 ml-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span>By</span>
+                        <motion.div whileHover={{ scale: 1.05 }}>
+                          <Link 
+                            to={`/donor-profile/${donation.donorId._id}`}
+                            className="text-blue-600 hover:text-blue-800 font-medium hover:underline transition-colors duration-200"
+                          >
+                            {donation.donorName}
+                          </Link>
+                        </motion.div>
+                        {donation.donorId.averageRating > 0 ? (
+                          <motion.div 
+                            className="flex items-center gap-1 ml-2 p-1 bg-yellow-50/50 rounded-md backdrop-blur-sm"
+                            whileHover={{ scale: 1.05 }}
+                          >
                             <div className="flex">
                               {renderStars(donation.donorId.averageRating)}
                             </div>
-                            <span className="text-xs text-gray-600">
+                            <span className="text-xs text-yellow-700 font-medium">
                               {donation.donorId.averageRating.toFixed(1)}
                             </span>
                             <span className="text-xs text-gray-500">
                               ({donation.donorId.totalRatings})
                             </span>
-                          </div>
+                          </motion.div>
+                        ) : (
+                          <span className="text-xs text-gray-400 ml-2 italic">
+                            Not Rated
+                          </span>
                         )}
                       </div>
                     </div>
@@ -374,13 +595,14 @@ const BrowsePage = () => {
                       )}
                     </div>
                   </div>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
-    </div>
+      </div>
+    </motion.div>
   );
 };
 

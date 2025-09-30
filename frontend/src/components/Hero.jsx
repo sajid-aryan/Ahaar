@@ -1,51 +1,161 @@
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useAuthStore } from '../store/authStore';
+import Spline from '@splinetool/react-spline';
 
 const Hero = () => {
   const { isAuthenticated, user } = useAuthStore();
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.3,
+        delayChildren: 0.2
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 30, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.8,
+        ease: "easeOut"
+      }
+    }
+  };
+
+  const buttonVariants = {
+    hidden: { scale: 0.8, opacity: 0 },
+    visible: {
+      scale: 1,
+      opacity: 1,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut"
+      }
+    },
+    hover: {
+      scale: 1.05,
+      y: -2,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut"
+      }
+    },
+    tap: {
+      scale: 0.98
+    }
+  };
+
   return (
-    <section className="text-center py-40 px-6 ">
+    <motion.section 
+      className="relative text-center py-20 px-6"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <div className="relative z-10">
       {isAuthenticated && user ? (
-        <div className="mb-8">
-          <h2 className="text-2xl font-semibold text-gray-700 mb-2">
+        <motion.div className="mb-8" variants={itemVariants}>
+          <motion.h2 
+            className="text-2xl font-semibold text-gray-700 mb-2"
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
             Welcome back, {user.name}! 👋
-          </h2>
-          <p className="text-lg text-gray-600 capitalize">
+          </motion.h2>
+          <motion.p 
+            className="text-lg text-gray-600 capitalize"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
             Ready to make a difference?
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
       ) : null}
       
-      <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-200">Give More, Waste Less – Empower Communities with Ahaar</h1>
-      <p className="py-10 text-lg font-medium font-sans text-neutral-600">
+      <motion.h1 
+        className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-200 gradient-text"
+        variants={itemVariants}
+        style={{ 
+          fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+          lineHeight: '1.1',
+          marginBottom: '1.5rem'
+        }}
+      >
+        Give More, Waste Less – Empower Communities with Ahaar
+      </motion.h1>
+      
+      <motion.p 
+        className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed"
+        variants={itemVariants}
+      >
         A platform where restaurants and individuals donate surplus food, clothes, and essentials to NGOs helping those in need.
-      </p>
-      <div className="flex justify-center gap-6 flex-wrap">
+      </motion.p>
+      
+      <motion.div 
+        className="flex flex-col sm:flex-row justify-center gap-4 items-center"
+        variants={itemVariants}
+      >
         {isAuthenticated ? (
           <>
-            {user?.userType === 'ngo' ? (
+            {user?.userType === 'donor' ? (
               <>
-                <Link to="/browse" className="btn btn-primary transition duration-300 ease-in-out hover:scale-105 hover:shadow-lg transform">Browse & Claim Donations</Link>
-                <Link to="/claimed-donations" className="btn btn-outline btn-success transition duration-300 ease-in-out hover:scale-105 hover:shadow-lg transform">My Claimed Donations</Link>
-                <Link to="/manage-profile" className="btn btn-outline btn-secondary transition duration-300 ease-in-out hover:scale-105 hover:shadow-lg transform">Manage Profile</Link>
+                <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
+                  <Link to="/create-donation" className="btn btn-success transition-all duration-300 shadow-lg glass-card sparkle animate-pulse-glow">
+                    Start Donating
+                  </Link>
+                </motion.div>
+                <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
+                  <Link to="/browse" className="btn btn-outline btn-success transition-all duration-300 shadow-lg animate-shimmer">
+                    Browse Donations
+                  </Link>
+                </motion.div>
+                <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
+                  <Link to="/ngo-profiles" className="btn btn-outline btn-info transition-all duration-300 shadow-lg">
+                    See How You Can Help
+                  </Link>
+                </motion.div>
               </>
             ) : (
               <>
-                <Link to="/create-donation" className="btn btn-success transition duration-300 ease-in-out hover:scale-105 hover:shadow-lg transform">Start Donating</Link>
-                <Link to="/browse" className="btn btn-outline btn-success transition duration-300 ease-in-out hover:scale-105 hover:shadow-lg transform">Browse Donations</Link>
-                <Link to="/ngo-profiles" className="btn btn-outline btn-info transition duration-300 ease-in-out hover:scale-105 hover:shadow-lg transform">See How You Can Help</Link>
+                <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
+                  <Link to="/browse" className="btn btn-outline btn-success transition-all duration-300 shadow-lg animate-shimmer">
+                    Browse Donations
+                  </Link>
+                </motion.div>
+                <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
+                  <Link to="/ngo-profiles" className="btn btn-outline btn-info transition-all duration-300 shadow-lg">
+                    See How You Can Help
+                  </Link>
+                </motion.div>
               </>
             )}
           </>
         ) : (
           <>
-            <Link to="/signup" className="btn btn-success transition duration-300 ease-in-out hover:scale-105 hover:shadow-lg transform">Get Started</Link>
-            <Link to="/ngo-profiles" className="btn btn-outline btn-info transition duration-300 ease-in-out hover:scale-105 hover:shadow-lg transform">See How You Can Help</Link>
+            <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
+              <Link to="/signup" className="btn btn-success transition-all duration-300 shadow-lg glass-card sparkle animate-pulse-glow">
+                Get Started
+              </Link>
+            </motion.div>
+            <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
+              <Link to="/ngo-profiles" className="btn btn-outline btn-info transition-all duration-300 shadow-lg animate-shimmer">
+                See How You Can Help
+              </Link>
+            </motion.div>
           </>
         )}
+      </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 };
 

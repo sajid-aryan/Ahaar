@@ -107,7 +107,161 @@ export default function ManageUserProfilePage() {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-slate-100 to-green-50 py-8">
+    <motion.div 
+      className="relative min-h-screen bg-gradient-to-br from-pink-50 via-slate-100 to-green-50 overflow-hidden py-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6 }}
+    >
+      {/* Enhanced Background Effects */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {/* Dynamic Gradient Orbs */}
+        <motion.div
+          className="absolute top-10 right-10 w-60 h-60 opacity-30"
+          style={{
+            background: 'conic-gradient(from 0deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3, #ff6b6b)',
+            borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
+            filter: 'blur(40px)',
+          }}
+          animate={{ 
+            rotate: [0, 360],
+            borderRadius: [
+              '60% 40% 30% 70% / 60% 30% 70% 40%',
+              '40% 60% 70% 30% / 40% 70% 30% 60%',
+              '30% 70% 40% 60% / 70% 40% 60% 30%',
+              '60% 40% 30% 70% / 60% 30% 70% 40%'
+            ]
+          }}
+          transition={{ 
+            duration: 20, 
+            repeat: Infinity,
+            ease: "linear"
+          }}
+        />
+        
+        <motion.div
+          className="absolute bottom-20 left-10 w-80 h-80 opacity-25"
+          style={{
+            background: 'radial-gradient(circle, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+            borderRadius: '30% 70% 40% 60% / 50% 60% 40% 50%',
+            filter: 'blur(50px)',
+          }}
+          animate={{ 
+            scale: [1, 1.2, 0.8, 1],
+            rotate: [0, -360],
+            borderRadius: [
+              '30% 70% 40% 60% / 50% 60% 40% 50%',
+              '70% 30% 60% 40% / 30% 50% 60% 50%',
+              '40% 60% 30% 70% / 60% 40% 50% 60%',
+              '30% 70% 40% 60% / 50% 60% 40% 50%'
+            ]
+          }}
+          transition={{ 
+            duration: 25, 
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+
+        {/* Floating Icons */}
+        {['👤', '📋', '✏️', '💼', '📊', '✨'].map((icon, index) => (
+          <motion.div
+            key={index}
+            className="absolute text-6xl opacity-15"
+            style={{
+              left: `${15 + (index * 12)}%`,
+              top: `${25 + (index * 10)}%`,
+            }}
+            animate={{ 
+              y: [0, -30, 0],
+              rotate: [0, 360],
+              scale: [1, 1.2, 1],
+            }}
+            transition={{ 
+              duration: 8 + index * 2, 
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: index * 0.7
+            }}
+          >
+            {icon}
+          </motion.div>
+        ))}
+
+        {/* Geometric Shapes */}
+        <motion.div
+          className="absolute top-1/4 right-1/4 w-32 h-32 opacity-20"
+          style={{
+            background: 'linear-gradient(45deg, #ff9a9e, #fecfef)',
+            clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
+          }}
+          animate={{ 
+            rotate: [0, 180, 360],
+            scale: [1, 1.3, 1],
+          }}
+          transition={{ 
+            duration: 12, 
+            repeat: Infinity,
+            ease: "linear"
+          }}
+        />
+
+        <motion.div
+          className="absolute bottom-1/3 right-1/3 w-24 h-24 opacity-25"
+          style={{
+            background: 'linear-gradient(135deg, #667eea, #764ba2)',
+            borderRadius: '50%',
+          }}
+          animate={{ 
+            x: [0, 50, -50, 0],
+            y: [0, -30, 30, 0],
+            scale: [1, 1.5, 0.8, 1],
+          }}
+          transition={{ 
+            duration: 15, 
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+
+        {/* Sparkle Effects */}
+        {Array.from({ length: 12 }).map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-2 h-2 bg-yellow-300 rounded-full opacity-60"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              scale: [0, 1, 0],
+              opacity: [0.6, 1, 0.6],
+              rotate: [0, 180, 360],
+            }}
+            transition={{
+              duration: 3 + Math.random() * 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: Math.random() * 2,
+            }}
+          />
+        ))}
+
+        {/* Mesh Gradient Overlay */}
+        <div 
+          className="absolute inset-0 opacity-30"
+          style={{
+            background: `
+              radial-gradient(circle at 20% 20%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+              radial-gradient(circle at 40% 60%, rgba(120, 219, 255, 0.3) 0%, transparent 50%)
+            `,
+            animation: 'aurora 15s ease-in-out infinite'
+          }}
+        />
+      </div>
+
+      <div className="relative z-10">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -300,6 +454,7 @@ export default function ManageUserProfilePage() {
           </div>
         </motion.div>
       </div>
-    </div>
+      </div>
+    </motion.div>
   );
 }

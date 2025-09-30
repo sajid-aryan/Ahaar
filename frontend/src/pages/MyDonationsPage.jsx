@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from 'react-router';
+import { motion } from 'framer-motion';
 import { ArrowLeft, MapPin, Package, Calendar, User, Star, Trash2, Edit, X, Save } from 'lucide-react';
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
@@ -139,15 +140,127 @@ const MyDonationsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-slate-100 to-green-50">
+    <motion.div 
+      className="relative min-h-screen bg-gradient-to-br from-pink-50 via-slate-100 to-green-50 overflow-hidden"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6 }}
+    >
+      {/* Enhanced Background Effects */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {/* Dynamic Gradient Orbs */}
+        <motion.div
+          className="absolute top-10 right-10 w-60 h-60 opacity-30"
+          style={{
+            background: 'conic-gradient(from 0deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3, #ff6b6b)',
+            borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
+            filter: 'blur(40px)',
+          }}
+          animate={{ 
+            rotate: [0, 360],
+            borderRadius: [
+              '60% 40% 30% 70% / 60% 30% 70% 40%',
+              '40% 60% 70% 30% / 40% 70% 30% 60%',
+              '30% 70% 40% 60% / 70% 40% 60% 30%',
+              '60% 40% 30% 70% / 60% 30% 70% 40%'
+            ]
+          }}
+          transition={{ 
+            duration: 20, 
+            repeat: Infinity,
+            ease: "linear"
+          }}
+        />
+        
+        <motion.div
+          className="absolute bottom-20 left-10 w-80 h-80 opacity-25"
+          style={{
+            background: 'radial-gradient(circle, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+            borderRadius: '30% 70% 40% 60% / 50% 60% 40% 50%',
+            filter: 'blur(50px)',
+          }}
+          animate={{ 
+            scale: [1, 1.2, 0.8, 1],
+            rotate: [0, -360],
+            borderRadius: [
+              '30% 70% 40% 60% / 50% 60% 40% 50%',
+              '70% 30% 60% 40% / 30% 50% 60% 50%',
+              '40% 60% 30% 70% / 60% 40% 50% 60%',
+              '30% 70% 40% 60% / 50% 60% 40% 50%'
+            ]
+          }}
+          transition={{ 
+            duration: 25, 
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+
+        {/* Floating Icons */}
+        {['📦', '💝', '🏠', '❤️', '🎁', '✨'].map((icon, index) => (
+          <motion.div
+            key={index}
+            className="absolute text-6xl opacity-15"
+            style={{
+              left: `${15 + (index * 12)}%`,
+              top: `${25 + (index * 10)}%`,
+            }}
+            animate={{ 
+              y: [0, -30, 0],
+              rotate: [0, 360],
+              scale: [1, 1.2, 1],
+            }}
+            transition={{ 
+              duration: 8 + index * 2, 
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: index * 0.7
+            }}
+          >
+            {icon}
+          </motion.div>
+        ))}
+
+        {/* Sparkle Effects */}
+        {Array.from({ length: 10 }).map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-2 h-2 bg-yellow-300 rounded-full opacity-60"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              scale: [0, 1, 0],
+              opacity: [0.6, 1, 0.6],
+              rotate: [0, 180, 360],
+            }}
+            transition={{
+              duration: 3 + Math.random() * 2,
+              repeat: Infinity,
+              delay: Math.random() * 2,
+              ease: "easeInOut"
+            }}
+          />
+        ))}
+      </div>
+      
+      <div className="relative z-10">
       <div className="container mx-auto px-6 py-8">
-        <div className="flex justify-between items-center mb-8">
+        <motion.div 
+          className="flex justify-between items-center mb-8"
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
           <h1 className="text-3xl font-bold">My Donations</h1>
-          <Link to="/browse" className="btn btn-ghost">
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Back to Browse
-          </Link>
-        </div>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Link to="/browse" className="btn btn-ghost">
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              Back to Browse
+            </Link>
+          </motion.div>
+        </motion.div>
         
         {loading && (
           <div className="text-center text-primary py-10">
@@ -171,16 +284,36 @@ const MyDonationsPage = () => {
         )}
 
         {myDonations.length > 0 && !loading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {myDonations.map((donation) => (
-              <div key={donation._id} className="card bg-base-100 shadow-xl border border-blue-200">
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
+            {myDonations.map((donation, index) => (
+              <motion.div 
+                key={donation._id} 
+                className="group card bg-base-100/80 backdrop-blur-sm shadow-xl transition-all duration-200 glass-card relative overflow-hidden hover:shadow-2xl hover:-translate-y-1 hover:scale-[1.02]"
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ 
+                  duration: 0.5, 
+                  delay: index * 0.1 
+                }}
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255,255,255,0.3)',
+                }}
+              >
                 {donation.image && (
-                  <figure>
+                  <figure className="relative overflow-hidden rounded-t-lg">
                     <img 
                       src={`http://localhost:3004${donation.image}`}
                       alt={donation.title}
-                      className="h-48 w-full object-cover"
+                      className="h-48 w-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </figure>
                 )}
                 
@@ -276,57 +409,81 @@ const MyDonationsPage = () => {
                       </div>
                     </div>
                   ) : (
-                    // View mode
-                    <>
-                      <h2 className="card-title">{donation.title}</h2>
+                    // View mode - Enhanced styling
+                    <motion.div
+                      className="relative"
+                      whileHover={{ scale: 1.02 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <h2 className="card-title text-lg font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-3">
+                        {donation.title}
+                      </h2>
                       
-                      <div className="flex gap-2 mb-2">
-                        <div className="badge badge-primary">{donation.category}</div>
-                        <div className={`badge ${
-                          donation.status === 'available' ? 'badge-success' : 
-                          donation.status === 'claimed' ? 'badge-warning' :
-                          donation.status === 'completed' ? 'badge-info' : 'badge-error'
-                        }`}>
+                      <div className="flex gap-2 mb-3">
+                        <motion.div 
+                          className={`px-3 py-1 rounded-full text-xs font-semibold text-white shadow-lg relative overflow-hidden ${
+                            donation.category === 'food' ? 'bg-gradient-to-r from-green-400 to-green-600' :
+                            donation.category === 'clothing' ? 'bg-gradient-to-r from-blue-400 to-blue-600' :
+                            donation.category === 'medical' ? 'bg-gradient-to-r from-red-400 to-red-600' :
+                            'bg-gradient-to-r from-purple-400 to-purple-600'
+                          }`}
+                          whileHover={{ scale: 1.05 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <div className="absolute inset-0 bg-white/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                          {donation.category}
+                        </motion.div>
+                        
+                        <motion.div 
+                          className={`px-3 py-1 rounded-full text-xs font-semibold text-white shadow-lg ${
+                            donation.status === 'available' ? 'bg-gradient-to-r from-emerald-400 to-emerald-600' : 
+                            donation.status === 'claimed' ? 'bg-gradient-to-r from-amber-400 to-amber-600' :
+                            donation.status === 'completed' ? 'bg-gradient-to-r from-sky-400 to-sky-600' : 
+                            'bg-gradient-to-r from-red-400 to-red-600'
+                          }`}
+                          whileHover={{ scale: 1.05 }}
+                          transition={{ duration: 0.2 }}
+                        >
                           {donation.status}
-                        </div>
+                        </motion.div>
                       </div>
                       
-                      <p className="text-sm text-gray-600 line-clamp-3">{donation.description}</p>
+                      <p className="text-sm text-gray-700 line-clamp-3 mb-4 leading-relaxed">{donation.description}</p>
                       
-                      <div className="space-y-2 mt-4">
-                        <div className="flex items-center text-sm">
-                          <Package className="w-4 h-4 mr-2 text-primary" />
-                          <span className="font-semibold">Quantity:</span>
-                          <span className="ml-1">{donation.quantity}</span>
+                      <div className="space-y-3 mb-4">
+                        <div className="flex items-center text-sm bg-gradient-to-r from-purple-50 to-blue-50 p-2 rounded-lg">
+                          <Package className="w-4 h-4 mr-2 text-purple-600" />
+                          <span className="font-semibold text-gray-800">Quantity:</span>
+                          <span className="ml-1 text-gray-700">{donation.quantity}</span>
                         </div>
                         
                         {donation.location && (
-                          <div className="flex items-center text-sm">
-                            <MapPin className="w-4 h-4 mr-2 text-primary" />
-                            <span className="font-semibold">Location:</span>
-                            <span className="ml-1">{donation.location}</span>
+                          <div className="flex items-center text-sm bg-gradient-to-r from-green-50 to-emerald-50 p-2 rounded-lg">
+                            <MapPin className="w-4 h-4 mr-2 text-green-600" />
+                            <span className="font-semibold text-gray-800">Location:</span>
+                            <span className="ml-1 text-gray-700">{donation.location}</span>
                           </div>
                         )}
                         
-                        <div className="flex items-center text-sm">
-                          <Calendar className="w-4 h-4 mr-2 text-primary" />
-                          <span className="font-semibold">Created:</span>
-                          <span className="ml-1">{formatDate(donation.createdAt)}</span>
+                        <div className="flex items-center text-sm bg-gradient-to-r from-blue-50 to-indigo-50 p-2 rounded-lg">
+                          <Calendar className="w-4 h-4 mr-2 text-blue-600" />
+                          <span className="font-semibold text-gray-800">Created:</span>
+                          <span className="ml-1 text-gray-700">{formatDate(donation.createdAt)}</span>
                         </div>
                         
                         {donation.status === 'claimed' && donation.claimerName && (
-                          <div className="flex items-center text-sm">
-                            <User className="w-4 h-4 mr-2 text-warning" />
-                            <span className="font-semibold">Claimed by:</span>
-                            <span className="ml-1">{donation.claimerName}</span>
+                          <div className="flex items-center text-sm bg-gradient-to-r from-amber-50 to-orange-50 p-2 rounded-lg">
+                            <User className="w-4 h-4 mr-2 text-amber-600" />
+                            <span className="font-semibold text-gray-800">Claimed by:</span>
+                            <span className="ml-1 text-gray-700">{donation.claimerName}</span>
                           </div>
                         )}
 
                         {donation.ratings && donation.ratings.length > 0 && (
-                          <div className="flex items-center text-sm">
-                            <Star className="w-4 h-4 mr-2 text-yellow-500" />
-                            <span className="font-semibold">Average Rating:</span>
-                            <span className="ml-1">
+                          <div className="flex items-center text-sm bg-gradient-to-r from-yellow-50 to-amber-50 p-2 rounded-lg">
+                            <Star className="w-4 h-4 mr-2 text-yellow-600" />
+                            <span className="font-semibold text-gray-800">Average Rating:</span>
+                            <span className="ml-1 text-gray-700">
                               {(donation.ratings.reduce((sum, r) => sum + r.rating, 0) / donation.ratings.length).toFixed(1)}/5
                               ({donation.ratings.length} rating{donation.ratings.length !== 1 ? 's' : ''})
                             </span>
@@ -334,11 +491,11 @@ const MyDonationsPage = () => {
                         )}
                       </div>
                       
-                      <div className="card-actions justify-between mt-4">
-                        <div className="text-xs text-primary font-medium">
+                      <div className="card-actions justify-between mt-6">
+                        <div className="text-xs font-medium bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                           ✓ Created by you
                           {!canEdit(donation) && !canDelete(donation) && (
-                            <div className="text-gray-500 mt-1">
+                            <div className="text-gray-500 mt-1 font-normal">
                               {donation.status === 'claimed' ? 'Cannot edit/delete claimed donations' : 
                                donation.status === 'expired' ? 'Cannot edit/delete expired donations' : 
                                'Cannot edit/delete this donation'}
@@ -347,19 +504,25 @@ const MyDonationsPage = () => {
                         </div>
                         <div className="flex gap-2">
                           {canEdit(donation) && (
-                            <button 
-                              className="btn btn-primary btn-sm"
+                            <motion.button 
+                              className="btn btn-primary btn-sm bg-gradient-to-r from-blue-500 to-purple-600 border-none text-white shadow-lg hover:shadow-xl"
                               onClick={() => handleEditStart(donation)}
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              transition={{ duration: 0.2 }}
                             >
                               <Edit className="w-4 h-4 mr-1" />
                               Edit
-                            </button>
+                            </motion.button>
                           )}
                           {canDelete(donation) && (
-                            <button 
-                              className={`btn btn-error btn-sm ${deletingId === donation._id ? 'loading' : ''}`}
+                            <motion.button 
+                              className={`btn btn-error btn-sm bg-gradient-to-r from-red-500 to-pink-600 border-none text-white shadow-lg hover:shadow-xl ${deletingId === donation._id ? 'loading' : ''}`}
                               onClick={() => handleDeleteDonation(donation._id)}
                               disabled={deletingId === donation._id}
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              transition={{ duration: 0.2 }}
                             >
                               {deletingId === donation._id ? (
                                 'Deleting...'
@@ -369,19 +532,20 @@ const MyDonationsPage = () => {
                                   Delete
                                 </>
                               )}
-                            </button>
+                            </motion.button>
                           )}
                         </div>
                       </div>
-                    </>
+                    </motion.div>
                   )}
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
-    </div>
+      </div>
+    </motion.div>
   );
 };
 

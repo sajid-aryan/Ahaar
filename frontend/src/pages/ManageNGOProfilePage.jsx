@@ -288,17 +288,201 @@ const ManageNGOProfilePage = () => {
 
   if (error && !profile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-slate-100 to-green-50 flex items-center justify-center">
-        <div className="text-center">
+      <motion.div 
+        className="relative min-h-screen bg-gradient-to-br from-pink-50 via-slate-100 to-green-50 overflow-hidden flex items-center justify-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      >
+        {/* Enhanced Background Effects */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {/* Dynamic Gradient Orbs */}
+          <motion.div
+            className="absolute top-10 right-10 w-60 h-60 opacity-30"
+            style={{
+              background: 'conic-gradient(from 0deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3, #ff6b6b)',
+              borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
+              filter: 'blur(40px)',
+            }}
+            animate={{ 
+              rotate: [0, 360],
+              borderRadius: [
+                '60% 40% 30% 70% / 60% 30% 70% 40%',
+                '40% 60% 70% 30% / 40% 70% 30% 60%',
+                '30% 70% 40% 60% / 70% 40% 60% 30%',
+                '60% 40% 30% 70% / 60% 30% 70% 40%'
+              ]
+            }}
+            transition={{ 
+              duration: 20, 
+              repeat: Infinity,
+              ease: "linear"
+            }}
+          />
+          
+          <motion.div
+            className="absolute bottom-20 left-10 w-80 h-80 opacity-25"
+            style={{
+              background: 'radial-gradient(circle, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+              borderRadius: '30% 70% 40% 60% / 50% 60% 40% 50%',
+              filter: 'blur(50px)',
+            }}
+            animate={{ 
+              scale: [1, 1.2, 0.8, 1],
+              rotate: [0, -360],
+              borderRadius: [
+                '30% 70% 40% 60% / 50% 60% 40% 50%',
+                '70% 30% 60% 40% / 30% 50% 60% 50%',
+                '40% 60% 30% 70% / 60% 40% 50% 60%',
+                '30% 70% 40% 60% / 50% 60% 40% 50%'
+              ]
+            }}
+            transition={{ 
+              duration: 25, 
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+
+          {/* Sparkle Effects */}
+          {Array.from({ length: 10 }).map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-yellow-300 rounded-full opacity-60"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                scale: [0, 1, 0],
+                opacity: [0.6, 1, 0.6],
+                rotate: [0, 180, 360],
+              }}
+              transition={{
+                duration: 3 + Math.random() * 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: Math.random() * 2,
+              }}
+            />
+          ))}
+        </div>
+
+        <div className="relative z-10 text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h2>
           <p className="text-gray-600">{error}</p>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-slate-100 to-green-50 py-8">
+    <motion.div 
+      className="relative min-h-screen bg-gradient-to-br from-pink-50 via-slate-100 to-green-50 overflow-hidden py-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6 }}
+    >
+      {/* Enhanced Background Effects */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {/* Dynamic Gradient Orbs */}
+        <motion.div
+          className="absolute top-10 right-10 w-60 h-60 opacity-30"
+          style={{
+            background: 'conic-gradient(from 0deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3, #ff6b6b)',
+            borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
+            filter: 'blur(40px)',
+          }}
+          animate={{ 
+            rotate: [0, 360],
+            borderRadius: [
+              '60% 40% 30% 70% / 60% 30% 70% 40%',
+              '40% 60% 70% 30% / 40% 70% 30% 60%',
+              '30% 70% 40% 60% / 70% 40% 60% 30%',
+              '60% 40% 30% 70% / 60% 30% 70% 40%'
+            ]
+          }}
+          transition={{ 
+            duration: 20, 
+            repeat: Infinity,
+            ease: "linear"
+          }}
+        />
+        
+        <motion.div
+          className="absolute bottom-20 left-10 w-80 h-80 opacity-25"
+          style={{
+            background: 'radial-gradient(circle, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+            borderRadius: '30% 70% 40% 60% / 50% 60% 40% 50%',
+            filter: 'blur(50px)',
+          }}
+          animate={{ 
+            scale: [1, 1.2, 0.8, 1],
+            rotate: [0, -360],
+            borderRadius: [
+              '30% 70% 40% 60% / 50% 60% 40% 50%',
+              '70% 30% 60% 40% / 30% 50% 60% 50%',
+              '40% 60% 30% 70% / 60% 40% 50% 60%',
+              '30% 70% 40% 60% / 50% 60% 40% 50%'
+            ]
+          }}
+          transition={{ 
+            duration: 25, 
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+
+        {/* Floating Icons */}
+        {['⚙️', '📋', '🏠', '❤️', '🎁', '✨'].map((icon, index) => (
+          <motion.div
+            key={index}
+            className="absolute text-6xl opacity-15"
+            style={{
+              left: `${15 + (index * 12)}%`,
+              top: `${25 + (index * 10)}%`,
+            }}
+            animate={{ 
+              y: [0, -30, 0],
+              rotate: [0, 360],
+              scale: [1, 1.2, 1],
+            }}
+            transition={{ 
+              duration: 8 + index * 2, 
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: index * 0.7
+            }}
+          >
+            {icon}
+          </motion.div>
+        ))}
+
+        {/* Sparkle Effects */}
+        {Array.from({ length: 10 }).map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-2 h-2 bg-yellow-300 rounded-full opacity-60"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              scale: [0, 1, 0],
+              opacity: [0.6, 1, 0.6],
+              rotate: [0, 180, 360],
+            }}
+            transition={{
+              duration: 3 + Math.random() * 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: Math.random() * 2,
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="relative z-10">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -655,7 +839,8 @@ const ManageNGOProfilePage = () => {
           </motion.div>
         </motion.div>
       )}
-    </div>
+      </div>
+    </motion.div>
   );
 };
 
