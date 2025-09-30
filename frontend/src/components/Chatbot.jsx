@@ -17,6 +17,7 @@ const Chatbot = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isConnected, setIsConnected] = useState(true);
+  const [isAiAvailable, setIsAiAvailable] = useState(false); // Track AI availability
   const chatRef = useRef(null);
   const messagesEndRef = useRef(null);
 
@@ -63,6 +64,8 @@ const Chatbot = () => {
       });
       
       if (response.data.success) {
+        setIsAiAvailable(true); // AI is working
+        setIsConnected(true);
         return {
           success: true,
           message: response.data.message,
@@ -74,6 +77,7 @@ const Chatbot = () => {
     } catch (error) {
       console.error('AI chat error:', error);
       setIsConnected(false);
+      setIsAiAvailable(false); // AI is not available
       
       // Fallback to basic responses
       return {
@@ -88,23 +92,181 @@ const Chatbot = () => {
   const getFallbackResponse = (message) => {
     const lowerMessage = message.toLowerCase();
     
+    // Money donation specific responses
+    if (lowerMessage.includes('money') || lowerMessage.includes('cash') || lowerMessage.includes('financial')) {
+      if (lowerMessage.includes('how') || lowerMessage.includes('give') || lowerMessage.includes('donate')) {
+        return "💰 **How to Give Money - Step by Step:**\n\n" +
+               "**Step 1:** Browse NGO Profiles\n" +
+               "• Click 'NGO Profiles' in the navigation\n" +
+               "• Browse organizations that need funding\n\n" +
+               "**Step 2:** Select an NGO\n" +
+               "• Click 'View Full Profile' on any NGO card\n" +
+               "• Review their mission and current needs\n\n" +
+               "**Step 3:** Choose a Financial Need\n" +
+               "• Look for needs marked with 💰 (money)\n" +
+               "• See the target amount and current progress\n\n" +
+               "**Step 4:** Make Your Donation\n" +
+               "• Click 'Donate Now' button\n" +
+               "• Enter your donation amount\n" +
+               "• Fill in payment details securely\n\n" +
+               "**Step 5:** Track Your Impact\n" +
+               "• View donation confirmation\n" +
+               "• See real-time progress updates\n\n" +
+               "⚠️ **Note:** You must be logged in to make money donations.";
+      }
+    }
+    
     if (lowerMessage.includes('how') && (lowerMessage.includes('donate') || lowerMessage.includes('donation'))) {
-      return "There are two ways to help: \n\n📤 **Create a Donation:** Share items you want to donate by going to 'Create Donation' (login required). List food, clothing, or other items for NGOs to claim. \n\n💰 **Make Money Donations:** 1) Browse NGO profiles, 2) Click on an organization, 3) Select a financial need, 4) Click 'Donate Now', 5) Fill in the amount and payment details. You must be logged in to donate money.";
+      return "📋 **How to Donate - Complete Guide:**\n\n" +
+             "**For Physical Items (Food, Clothes, etc.):**\n" +
+             "1️⃣ Log in to your account\n" +
+             "2️⃣ Click 'Create Donation'\n" +
+             "3️⃣ Fill item details (type, quantity, location)\n" +
+             "4️⃣ Add photos and description\n" +
+             "5️⃣ Submit for NGOs to claim\n\n" +
+             "**For Money Donations:**\n" +
+             "1️⃣ Go to 'NGO Profiles'\n" +
+             "2️⃣ Choose an organization\n" +
+             "3️⃣ Select a financial need (💰)\n" +
+             "4️⃣ Click 'Donate Now'\n" +
+             "5️⃣ Enter amount and payment details\n\n" +
+             "**Need help?** Ask me specific questions like 'How do I give money?' or 'How do I donate food?'";
     }
     
     if (lowerMessage.includes('create') && (lowerMessage.includes('donate') || lowerMessage.includes('donation'))) {
-      return "To create a donation: 1) Log in to your account, 2) Click 'Create Donation' in the navigation, 3) Fill in item details (type, quantity, location), 4) Add photos and description, 5) Submit for NGOs to browse and claim. This helps connect your items with organizations that need them!";
+      return "📤 **Create a Donation - Step by Step:**\n\n" +
+             "**Step 1:** Login Required\n" +
+             "• Must be logged in as a 'Donor'\n" +
+             "• Click 'Login' if not already signed in\n\n" +
+             "**Step 2:** Start Creating\n" +
+             "• Click 'Create Donation' in navigation\n" +
+             "• You'll see the donation form\n\n" +
+             "**Step 3:** Item Details\n" +
+             "• Choose category (Food, Clothing, Medical, Other)\n" +
+             "• Enter quantity and description\n" +
+             "• Add pickup location\n\n" +
+             "**Step 4:** Add Photos\n" +
+             "• Upload clear photos of items\n" +
+             "• This helps NGOs see what you're offering\n\n" +
+             "**Step 5:** Submit\n" +
+             "• Review all details\n" +
+             "• Click 'Create Donation'\n" +
+             "• NGOs can now browse and claim your items!";
     }
     
     if (lowerMessage.includes('sign up') || lowerMessage.includes('signup') || lowerMessage.includes('register') || lowerMessage.includes('account')) {
-      return "To create an account: 1) Click 'Sign Up' in the top right, 2) Choose 'Donor' or 'NGO', 3) Fill in your details, 4) Verify your email. NGOs can create profiles to receive donations.";
+      return "🔐 **Create Account - Step by Step:**\n\n" +
+             "**Step 1:** Choose Sign Up\n" +
+             "• Click 'Sign Up' button (top right)\n" +
+             "• You'll see the registration form\n\n" +
+             "**Step 2:** Select User Type\n" +
+             "• **Donor:** For individuals/restaurants donating\n" +
+             "• **NGO:** For organizations receiving donations\n\n" +
+             "**Step 3:** Fill Details\n" +
+             "• Enter name, email, password\n" +
+             "• Add phone number (optional)\n" +
+             "• For NGOs: Add organization details\n\n" +
+             "**Step 4:** Verify Email\n" +
+             "• Check your email for verification\n" +
+             "• Click the verification link\n\n" +
+             "**Step 5:** Complete Profile\n" +
+             "• Log in with your credentials\n" +
+             "• Complete your profile information\n" +
+             "• Start donating or receiving donations!";
+    }
+    
+    if (lowerMessage.includes('ngo') && (lowerMessage.includes('profile') || lowerMessage.includes('find') || lowerMessage.includes('help'))) {
+      return "🏢 **Find & Help NGOs - Step by Step:**\n\n" +
+             "**Step 1:** Browse NGOs\n" +
+             "• Click 'NGO Profiles' in navigation\n" +
+             "• See all registered organizations\n\n" +
+             "**Step 2:** Explore Profiles\n" +
+             "• Click 'View Full Profile' on any NGO\n" +
+             "• Read their mission and current needs\n\n" +
+             "**Step 3:** Choose How to Help\n" +
+             "• **Physical Items:** Create donations they need\n" +
+             "• **Money:** Click 'Donate Now' for financial needs\n" +
+             "• **Awareness:** Share their profile\n\n" +
+             "**Step 4:** Make Your Contribution\n" +
+             "• Follow donation steps based on your choice\n" +
+             "• Track your impact on their progress\n\n" +
+             "**Need specific help?** Ask 'How do I give money?' or 'How do I donate food?'";
+    }
+    
+    if (lowerMessage.includes('browse') && lowerMessage.includes('donation')) {
+      return "🔍 **Browse Donations - Step by Step:**\n\n" +
+             "**Step 1:** Access Browse Page\n" +
+             "• Click 'Browse Donations' (login required)\n" +
+             "• See all available donations\n\n" +
+             "**Step 2:** Filter Items\n" +
+             "• Use category filters (Food, Clothing, Medical, etc.)\n" +
+             "• Find items your organization needs\n\n" +
+             "**Step 3:** Review Details\n" +
+             "• Check item descriptions and photos\n" +
+             "• See pickup location and instructions\n" +
+             "• View donor contact information\n\n" +
+             "**Step 4:** Claim Donations (NGOs only)\n" +
+             "• Click 'Claim' button on desired items\n" +
+             "• Contact donor for pickup coordination\n\n" +
+             "**Note:** Only NGOs can claim donations. Donors can browse to see platform activity.";
     }
     
     if (lowerMessage.includes('help')) {
-      return "I'm here to help! You can ask me about: donations, creating accounts, NGO profiles, payments, tracking donations, profile management, or any other questions about Ahaar. (Note: AI features are temporarily unavailable)";
+      return "🤝 **I'm here to help! Here's what I can guide you through:**\n\n" +
+             "**Money Donations:**\n" +
+             "• Ask: 'How do I give money?'\n" +
+             "• Step-by-step payment process\n\n" +
+             "**Item Donations:**\n" +
+             "• Ask: 'How do I donate food/clothes?'\n" +
+             "• Creating and managing donations\n\n" +
+             "**Account Setup:**\n" +
+             "• Ask: 'How do I sign up?'\n" +
+             "• Registration and profile setup\n\n" +
+             "**Finding NGOs:**\n" +
+             "• Ask: 'How do I find NGOs to help?'\n" +
+             "• Browsing and selecting organizations\n\n" +
+             "**Platform Navigation:**\n" +
+             "• Ask about any specific feature\n" +
+             "• I'll provide detailed instructions!\n\n" +
+             "*Just type your question and I'll give you step-by-step guidance!*";
     }
     
-    return "I'm here to help you with Ahaar! You can ask me about donations, creating accounts, NGO profiles, or any questions about using our platform. What would you like to know? (Note: AI features are temporarily unavailable)";
+    return "🤖 **I'm your Ahaar assistant!** I can provide detailed step-by-step instructions for:\n\n" +
+           "💰 **Money donations** - Ask 'How do I give money?'\n" +
+           "📦 **Item donations** - Ask 'How do I donate food?'\n" +
+           "🔐 **Account setup** - Ask 'How do I sign up?'\n" +
+           "🏢 **Finding NGOs** - Ask 'How do I help NGOs?'\n" +
+           "🔍 **Browse features** - Ask about any platform feature\n\n" +
+           "*What would you like step-by-step help with?*\n\n" +
+           "*(Note: AI features are temporarily unavailable - using enhanced help mode)*";
+  };
+
+  const handleFAQClick = (question) => {
+    // Simulate user asking the question
+    const userMessage = {
+      id: Date.now(),
+      text: question,
+      isBot: false,
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setIsTyping(true);
+
+    // Get the response from our fallback system
+    setTimeout(() => {
+      const response = getFallbackResponse(question);
+      const botResponse = {
+        id: Date.now() + 1,
+        text: response,
+        isBot: true,
+        timestamp: new Date(),
+        isAI: false
+      };
+
+      setMessages(prev => [...prev, botResponse]);
+      setIsTyping(false);
+    }, 500); // Short delay to simulate thinking
   };
 
   const handleSendMessage = async () => {
@@ -237,6 +399,50 @@ const Chatbot = () => {
                   </div>
                 </div>
               ))}
+              
+              {/* FAQ Buttons - Show only when AI is down and conversation just started */}
+              {!isAiAvailable && messages.length === 1 && (
+                <div className="mb-4">
+                  <div className="text-gray-600 text-sm mb-3 text-center font-medium">
+                    🚀 Quick Help - Click a topic:
+                  </div>
+                  <div className="grid grid-cols-1 gap-2">
+                    <button
+                      onClick={() => handleFAQClick('How do I give money?')}
+                      className="p-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                    >
+                      💰 Money Donations
+                    </button>
+                    <button
+                      onClick={() => handleFAQClick('How do I donate food?')}
+                      className="p-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                    >
+                      🍽️ Donate Items (Food, Clothes)
+                    </button>
+                    <button
+                      onClick={() => handleFAQClick('How do I sign up?')}
+                      className="p-3 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                    >
+                      🔐 Create Account
+                    </button>
+                    <button
+                      onClick={() => handleFAQClick('How do I find NGOs to help?')}
+                      className="p-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                    >
+                      🏢 Find NGOs to Help
+                    </button>
+                    <button
+                      onClick={() => handleFAQClick('How do I browse donations?')}
+                      className="p-3 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                    >
+                      🔍 Browse Available Donations
+                    </button>
+                  </div>
+                  <div className="mt-3 text-center">
+                    <div className="text-gray-500 text-xs">💡 Or type your own question below</div>
+                  </div>
+                </div>
+              )}
               
               {/* Typing indicator */}
               {isTyping && (

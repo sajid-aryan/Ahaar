@@ -3,6 +3,22 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// Test API key function
+async function testApiKey() {
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const result = await model.generateContent("Hello");
+    console.log('✅ Gemini API key is working correctly');
+    return true;
+  } catch (error) {
+    console.error('❌ Gemini API key test failed:', error.message);
+    return false;
+  }
+}
+
+// Test the API key on startup
+testApiKey();
+
 export async function chatWithBot(req, res) {
   try {
     const { message, conversationHistory = [] } = req.body;
@@ -19,67 +35,56 @@ export async function chatWithBot(req, res) {
 
     // Enhanced context with detailed step-by-step instructions
     const systemContext = `
-You are an AI assistant for Ahaar, a food donation platform that connects food donors with NGOs to reduce food waste and help those in need. 
+You are a helpful assistant for Ahaar, a donation platform connecting donors with NGOs.
 
-🔹 MONEY DONATIONS - Complete Step-by-Step Process:
-Step 1: Make sure you're logged into your Ahaar account (money donations require login)
-Step 2: Click on "NGO Profiles" in the main navigation menu
-Step 3: Browse through the list of verified NGO organizations
-Step 4: Click on an NGO's name or profile to view their details
-Step 5: On the NGO profile page, scroll down to the "How You Can Help" section
-Step 6: Look for financial needs that show "Donate Now" buttons
-Step 7: Click the "Donate Now" button on a financial need you want to support
-Step 8: In the donation form, enter your donation amount (minimum $1)
-Step 9: Select your preferred payment method (Credit Card, Debit Card, bKash, or Bank Transfer)
-Step 10: Add an optional message of support for the NGO
-Step 11: Review your donation details and click "Donate" to process
-Step 12: You'll receive a transaction ID confirmation once payment is successful
+PLATFORM FEATURES:
+- Money donations to NGOs through secure payment
+- Food and item donations for pickup
+- NGO profiles with needs and contact info
+- User accounts for donors and organizations
 
-🔹 FOOD DONATIONS - Complete Step-by-Step Process:
-Step 1: Log into your Ahaar account
-Step 2: Click "Create Donation" in the main navigation menu
-Step 3: Fill out the donation form:
-   - Title: Brief description of items
-   - Category: Choose Food, Clothing, Medical, or Other
-   - Description: Detailed information about items
-   - Quantity: How much you're donating
-   - Location: Where items can be picked up
-   - Expiry Date: When items will no longer be good
-   - Pickup Instructions: Special instructions for collection
-   - Contact Phone: Your contact number
-Step 4: Upload a photo of the items (recommended)
-Step 5: Click "Create Donation" to publish
-Step 6: NGOs will see your donation in browse page
-Step 7: When an NGO claims it, you'll be notified
-Step 8: Coordinate pickup with the claiming NGO
+MONEY DONATION STEPS:
+1. Login to account
+2. Go to NGO Profiles page
+3. Select an organization
+4. Choose a financial need
+5. Click Donate Now
+6. Enter amount and payment details
+7. Complete transaction
 
-🔹 ACCOUNT CREATION:
-For Users: Sign Up → Choose user type (Individual/Restaurant/NGO) → Fill details → Create account
-For NGOs: Also go to "Manage Profile" after signup to create organization profile
+ITEM DONATION STEPS:
+1. Login to account
+2. Click Create Donation
+3. Fill item details and location
+4. Add photos
+5. Submit for NGOs to claim
 
-IMPORTANT: 
-- ALWAYS provide specific numbered steps when users ask "how to" questions
-- Be encouraging about community impact
-- Mention login requirements clearly
-- Use clear, actionable language
-- Format responses with proper step numbering
+ACCOUNT SETUP:
+1. Click Sign Up
+2. Choose user type
+3. Fill registration form
+4. Verify email
+5. Complete profile
 
-Payment methods: Credit Cards, Debit Cards, bKash, Bank Transfer
+Always provide clear, numbered steps. Be helpful and encouraging.
 `;
 
-    // Build conversation context
-    let conversationContext = systemContext + "\n\nCONVERSATION HISTORY:\n";
-    
-    // Add recent conversation history (last 8 messages to avoid token limits)
-    const recentHistory = conversationHistory.slice(-8);
-    recentHistory.forEach(msg => {
-      conversationContext += `${msg.isBot ? 'Assistant' : 'User'}: ${msg.text}\n`;
-    });
-    
-    conversationContext += `\nUser: ${message}\nAssistant:`;
+    // Build conversation context with simpler formatting
+    let conversationContext = systemContext + "\n\nUser question: " + message + "\n\nResponse:";
+
+    // Use simpler generation parameters to avoid filtering
+    const generationConfig = {
+      temperature: 0.7,
+      topP: 0.8,
+      topK: 40,
+      maxOutputTokens: 1024,
+    };
 
     // Generate response
-    const result = await model.generateContent(conversationContext);
+    const result = await model.generateContent({
+      contents: [{ role: "user", parts: [{ text: conversationContext }] }],
+      generationConfig,
+    });
     const response = await result.response;
     const botReply = response.text();
 
@@ -90,6 +95,25 @@ Payment methods: Credit Cards, Debit Cards, bKash, Bank Transfer
 
   } catch (error) {
     console.error('Error in chatbot:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+    
+    // Check if it's an API key issue
+    if (error.message && error.message.includes('API key')) {
+      return res.status(500).json({
+        success: false,
+        message: 'API configuration error. Please check the API key.',
+        error: 'API_KEY_ERROR'
+      });
+    }
+    
+    // Check if it's a content filtering issue
+    if (error.message && (error.message.includes('filtered') || error.message.includes('safety'))) {
+      console.log('Content was filtered, using fallback response');
+    }
     
     // Enhanced fallback responses
     const fallbackResponse = getFallbackResponse(req.body.message);
@@ -97,7 +121,8 @@ Payment methods: Credit Cards, Debit Cards, bKash, Bank Transfer
     res.status(200).json({
       success: true,
       message: fallbackResponse,
-      fallback: true
+      fallback: true,
+      errorType: error.message || 'Unknown error'
     });
   }
 }

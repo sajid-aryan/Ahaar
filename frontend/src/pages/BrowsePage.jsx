@@ -6,6 +6,7 @@ import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 import { formatDate } from '../../utils/date';
 import toast from 'react-hot-toast';
+import ClaimConfirmationModal from '../components/ClaimConfirmationModal';
 
 const BrowsePage = () => {
   const navigate = useNavigate();
@@ -17,6 +18,10 @@ const BrowsePage = () => {
   const [filter, setFilter] = useState('all');
   const [claimingId, setClaimingId] = useState(null);
   const [likingId, setLikingId] = useState(null);
+  const [confirmationModal, setConfirmationModal] = useState({
+    isOpen: false,
+    donation: null
+  });
 
   useEffect(() => {
     const fetchDonations = async () => {
@@ -75,6 +80,15 @@ const BrowsePage = () => {
       return;
     }
 
+    // Show confirmation modal
+    setConfirmationModal({
+      isOpen: true,
+      donation: donation
+    });
+  };
+
+  const confirmClaimDonation = async () => {
+    const donationId = confirmationModal.donation._id;
     setClaimingId(donationId);
     
     try {
@@ -86,7 +100,7 @@ const BrowsePage = () => {
       });
 
       if (response.data.success) {
-        toast.success('Donation claimed successfully!');
+        toast.success('🎉 Donation claimed successfully! The donor has been notified.');
         // Update the local donations list to reflect the status change
         setDonations(prevDonations => 
           prevDonations.map(donation => 
@@ -95,6 +109,9 @@ const BrowsePage = () => {
               : donation
           )
         );
+        
+        // Close confirmation modal
+        setConfirmationModal({ isOpen: false, donation: null });
       }
     } catch (error) {
       console.error('Error claiming donation:', error);
@@ -102,6 +119,10 @@ const BrowsePage = () => {
     } finally {
       setClaimingId(null);
     }
+  };
+
+  const closeConfirmationModal = () => {
+    setConfirmationModal({ isOpen: false, donation: null });
   };
 
   const handleLikeDonation = async (donationId) => {
@@ -174,6 +195,7 @@ const BrowsePage = () => {
   };
 
   return (
+    <>
     <motion.div 
       className="relative min-h-screen bg-gradient-to-br from-pink-50 via-slate-100 to-green-50 overflow-hidden"
       initial={{ opacity: 0 }}
@@ -603,6 +625,16 @@ const BrowsePage = () => {
       </div>
       </div>
     </motion.div>
+
+    {/* Claim Confirmation Modal */}
+    <ClaimConfirmationModal
+      isOpen={confirmationModal.isOpen}
+      onClose={closeConfirmationModal}
+      onConfirm={confirmClaimDonation}
+      donation={confirmationModal.donation}
+      isLoading={claimingId !== null}
+    />
+  </>
   );
 };
 

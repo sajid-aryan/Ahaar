@@ -3,10 +3,13 @@ import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Info, Menu, Home, UserPlus, LogIn, LogOut, User, History, Package, Building2, Settings } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
+import NotificationBell from './NotificationBell';
+import NotificationPanel from './NotificationPanel';
 
 const Navbar = () => {
   const { isAuthenticated, logout, user } = useAuthStore();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isNotificationPanelOpen, setIsNotificationPanelOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   // Close dropdown when clicking outside
@@ -76,6 +79,7 @@ const Navbar = () => {
   };
 
   return (
+    <>
     <motion.div 
       className="navbar py-4 bg-transparent backdrop-blur-sm relative z-50" 
       data-theme="garden"
@@ -95,6 +99,14 @@ const Navbar = () => {
       </div>
       
       <div className="flex-none gap-2">
+        {/* Notification Bell - Only show when user is logged in */}
+        {isAuthenticated && (
+          <NotificationBell 
+            onClick={() => setIsNotificationPanelOpen(true)}
+            className="mr-2"
+          />
+        )}
+        
         <div className="relative" ref={dropdownRef}>
           <motion.button 
             onClick={toggleDropdown}
@@ -196,6 +208,13 @@ const Navbar = () => {
         </div>
       </div>
     </motion.div>
+
+    {/* Notification Panel */}
+    <NotificationPanel 
+      isOpen={isNotificationPanelOpen}
+      onClose={() => setIsNotificationPanelOpen(false)}
+    />
+  </>
   );
 };
 

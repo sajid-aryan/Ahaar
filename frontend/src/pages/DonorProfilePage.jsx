@@ -32,6 +32,8 @@ const DonorProfilePage = () => {
     try {
       const response = await axios.get(`http://localhost:3004/api/donations/donor/${donorId}`);
       
+      console.log('Donor profile response:', response.data); // Debug log
+      
       if (response.data.success) {
         setDonorData(response.data);
       } else {

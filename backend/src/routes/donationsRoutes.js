@@ -13,7 +13,8 @@ import {
   getClaimedDonationsByNGO,
   likeDonation,
   submitFeedback,
-  getDonorProfile
+  getDonorProfile,
+  recalculateDonorRatings
 } from '../controllers/donationsController.js';
 
 const router = express.Router();
@@ -44,6 +45,9 @@ router.post('/:id/feedback', verifyToken, submitFeedback);
 
 // Get donor profile with ratings and reviews
 router.get('/donor/:donorId', getDonorProfile);
+
+// Utility: Recalculate all donor ratings (admin use)
+router.post('/admin/recalculate-ratings', recalculateDonorRatings);
 
 // Get donation by ID
 router.get('/:id', getDonationById);

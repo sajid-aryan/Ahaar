@@ -9,6 +9,7 @@ import donationsRoutes from './routes/donationsRoutes.js';
 import ngoProfileRoutes from './routes/ngoProfileRoutes.js';
 import userProfileRoutes from './routes/userProfileRoutes.js';
 import chatbotRoutes from './routes/chatbotRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
 import { connectDB } from './config/db.js';
 import { startExpiryChecker } from './utils/cronJobs.js';
 
@@ -45,6 +46,7 @@ app.use("/api/donations", donationsRoutes);
 app.use("/api/ngo-profiles", ngoProfileRoutes);
 app.use("/api/user-profile", userProfileRoutes);
 app.use("/api/chatbot", chatbotRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // Dashboard and donation management system
 connectDB().then(() => {
