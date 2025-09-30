@@ -12,7 +12,8 @@ import {
   completeDonation,
   getClaimedDonationsByNGO,
   likeDonation,
-  submitFeedback
+  submitFeedback,
+  getDonorProfile
 } from '../controllers/donationsController.js';
 
 const router = express.Router();
@@ -40,6 +41,9 @@ router.post('/:id/like', verifyToken, likeDonation);
 
 // Submit feedback for a completed donation
 router.post('/:id/feedback', verifyToken, submitFeedback);
+
+// Get donor profile with ratings and reviews
+router.get('/donor/:donorId', getDonorProfile);
 
 // Get donation by ID
 router.get('/:id', getDonationById);

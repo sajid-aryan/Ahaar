@@ -1,21 +1,36 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bot, X, Send, MessageCircle } from 'lucide-react';
+import axios from 'axios';
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [wiggle, setWiggle] = useState(false);
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "Hello! I'm your Ahaar assistant. How can I help you today?",
+      text: "Hello! I'm your AI-powered Ahaar assistant. I can help you with donations, account management, and answer any questions about our platform. How can I assist you today?",
       isBot: true,
       timestamp: new Date()
     }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [isConnected, setIsConnected] = useState(true);
   const chatRef = useRef(null);
   const messagesEndRef = useRef(null);
+
+  // Wiggle animation effect
+  useEffect(() => {
+    if (!isOpen) {
+      const wiggleInterval = setInterval(() => {
+        setWiggle(true);
+        setTimeout(() => setWiggle(false), 1000);
+      }, 4000);
+
+      return () => clearInterval(wiggleInterval);
+    }
+  }, [isOpen]);
 
   // Close chat when clicking outside
   useEffect(() => {
@@ -39,8 +54,38 @@ const Chatbot = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // FAQ responses
-  const getFAQResponse = (message) => {
+  // Send message to AI backend
+  const sendMessageToAI = async (message, conversationHistory) => {
+    try {
+      const response = await axios.post('http://localhost:3004/api/chatbot/chat', {
+        message,
+        conversationHistory
+      });
+      
+      if (response.data.success) {
+        return {
+          success: true,
+          message: response.data.message,
+          fallback: response.data.fallback || false
+        };
+      } else {
+        throw new Error('AI response failed');
+      }
+    } catch (error) {
+      console.error('AI chat error:', error);
+      setIsConnected(false);
+      
+      // Fallback to basic responses
+      return {
+        success: true,
+        message: getFallbackResponse(message),
+        fallback: true
+      };
+    }
+  };
+
+  // Basic fallback responses when AI is unavailable
+  const getFallbackResponse = (message) => {
     const lowerMessage = message.toLowerCase();
     
     if (lowerMessage.includes('how') && (lowerMessage.includes('donate') || lowerMessage.includes('donation'))) {
@@ -55,40 +100,11 @@ const Chatbot = () => {
       return "To create an account: 1) Click 'Sign Up' in the top right, 2) Choose 'Donor' or 'NGO', 3) Fill in your details, 4) Verify your email. NGOs can create profiles to receive donations.";
     }
     
-    if (lowerMessage.includes('profile') || lowerMessage.includes('manage profile')) {
-      return "🔧 **Profile Management:** \n\n**For NGOs:** Click your name → 'Manage Profile' to update organization details, add needs, and manage donations received. \n\n**For Individual/Restaurant Users:** Click your name → 'Manage Profile' to update personal info, add phone number, and view your donation statistics including total donations made and money donated. \n\n**Profile Stats:** Track your donation count and total money donated to see your impact!";
+    if (lowerMessage.includes('help')) {
+      return "I'm here to help! You can ask me about: donations, creating accounts, NGO profiles, payments, tracking donations, profile management, or any other questions about Ahaar. (Note: AI features are temporarily unavailable)";
     }
     
-    if (lowerMessage.includes('ngo') && (lowerMessage.includes('profile') || lowerMessage.includes('create'))) {
-      return "NGOs can create profiles by: 1) Signing up as an NGO, 2) Going to 'Manage Profile', 3) Adding organization details, logo, and current needs. Your profile will be visible to donors.";
-    }
-    
-    if (lowerMessage.includes('stats') || lowerMessage.includes('statistics') || lowerMessage.includes('track donations')) {
-      return "📊 **Donation Statistics:** Once logged in, go to 'Manage Profile' to view: \n• Total donations made (counted when claimed by NGOs) \n• Total money donated \n• Member since date \n• Last login \n\nYour donation count increases when NGOs claim your donations, showing real impact!";
-    }
-    
-    if (lowerMessage.includes('payment') || lowerMessage.includes('pay')) {
-      return "We accept Credit Cards, Debit Cards, bKash, and Bank Transfers. All payments are processed securely. You'll receive a transaction ID after successful donation.";
-    }
-    
-    if (lowerMessage.includes('track') || lowerMessage.includes('history') || lowerMessage.includes('my donations')) {
-      return "📋 **Track Your Donations:** \n1) Log in to your account \n2) Click 'My Donations' to see donation history \n3) View donation status updates \n4) Use 'View My Donations' button on your profile page \n\nYou can also see your overall donation statistics in your profile!";
-    }
-    
-    if (lowerMessage.includes('help') || lowerMessage.includes('support')) {
-      return "I'm here to help! You can ask me about: donations, creating accounts, NGO profiles, payments, tracking donations, profile management, donation statistics, or any other questions about Ahaar.";
-    }
-    
-    if (lowerMessage.includes('security') || lowerMessage.includes('safe')) {
-      return "Your security is our priority. We use encrypted connections, secure payment processing, and verified NGO profiles. All personal information is protected.";
-    }
-    
-    if (lowerMessage.includes('food') || lowerMessage.includes('medical') || lowerMessage.includes('clothing')) {
-      return "You can find organizations needing food, medical supplies, or clothing by browsing NGO profiles. Each organization lists their current needs and priorities.";
-    }
-    
-    // Default response
-    return "I'm not sure about that specific question. You can ask me about donations, creating accounts, NGO profiles, payments, profile management, donation statistics, or contact our support team for more detailed assistance.";
+    return "I'm here to help you with Ahaar! You can ask me about donations, creating accounts, NGO profiles, or any questions about using our platform. What would you like to know? (Note: AI features are temporarily unavailable)";
   };
 
   const handleSendMessage = async () => {
@@ -102,21 +118,46 @@ const Chatbot = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentInput = inputMessage;
     setInputMessage('');
     setIsTyping(true);
 
-    // Simulate typing delay
-    setTimeout(() => {
-      const botResponse = {
+    try {
+      // Send message to AI with conversation history
+      const aiResponse = await sendMessageToAI(currentInput, messages);
+      
+      setTimeout(() => {
+        const botResponse = {
+          id: Date.now() + 1,
+          text: aiResponse.message,
+          isBot: true,
+          timestamp: new Date(),
+          isAI: !aiResponse.fallback
+        };
+        
+        setMessages(prev => [...prev, botResponse]);
+        setIsTyping(false);
+        
+        // Reset connection status if AI is working
+        if (!aiResponse.fallback && !isConnected) {
+          setIsConnected(true);
+        }
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setIsTyping(false);
+      
+      const errorResponse = {
         id: Date.now() + 1,
-        text: getFAQResponse(inputMessage),
+        text: "I'm having trouble connecting right now. Please try again in a moment, or ask me about donations, accounts, or platform features!",
         isBot: true,
-        timestamp: new Date()
+        timestamp: new Date(),
+        isAI: false
       };
       
-      setMessages(prev => [...prev, botResponse]);
-      setIsTyping(false);
-    }, 1000);
+      setMessages(prev => [...prev, errorResponse]);
+    }
   };
 
   const handleKeyPress = (e) => {
@@ -139,13 +180,21 @@ const Chatbot = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute bottom-20 right-0 w-80 h-96 bg-white rounded-lg shadow-2xl border border-gray-200 flex flex-col"
+            className="absolute bottom-20 right-0 w-96 h-[500px] bg-white rounded-lg shadow-2xl border border-gray-200 flex flex-col"
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-pink-500 to-green-500 text-white p-4 rounded-t-lg flex items-center justify-between">
               <div className="flex items-center">
                 <Bot className="mr-2" size={20} />
-                <span className="font-semibold">Ahaar Assistant</span>
+                <div>
+                  <span className="font-semibold">Ahaar AI Assistant</span>
+                  <div className="flex items-center mt-1">
+                    <div className={`w-2 h-2 rounded-full mr-1 ${isConnected ? 'bg-green-300' : 'bg-red-300'}`}></div>
+                    <span className="text-xs opacity-90">
+                      {isConnected ? 'AI Powered' : 'Basic Mode'}
+                    </span>
+                  </div>
+                </div>
               </div>
               <button
                 onClick={toggleChat}
@@ -165,14 +214,26 @@ const Chatbot = () => {
                   <div
                     className={`max-w-xs p-3 rounded-lg ${
                       message.isBot
-                        ? 'bg-white text-gray-800 shadow-sm'
+                        ? 'bg-white text-gray-800 shadow-sm border-l-4 border-l-pink-500'
                         : 'bg-gradient-to-r from-pink-500 to-green-500 text-white'
                     }`}
                   >
-                    <p className="text-sm">{message.text}</p>
-                    <p className="text-xs mt-1 opacity-70">
-                      {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </p>
+                    <p className="text-sm whitespace-pre-line">{message.text}</p>
+                    <div className="flex items-center justify-between mt-2">
+                      <p className="text-xs opacity-70">
+                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                      {message.isBot && (
+                        <div className="flex items-center">
+                          {message.isAI !== false && (
+                            <span className="text-xs opacity-60 ml-2 flex items-center">
+                              <Bot className="w-3 h-3 mr-1" />
+                              AI
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -221,6 +282,14 @@ const Chatbot = () => {
         onClick={toggleChat}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
+        animate={{
+          rotate: wiggle && !isOpen ? [0, -10, 10, -10, 10, 0] : 0,
+          scale: wiggle && !isOpen ? [1, 1.05, 1, 1.05, 1] : 1
+        }}
+        transition={{
+          duration: wiggle ? 1 : 0.2,
+          ease: "easeInOut"
+        }}
         className={`w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-white transition-all duration-300 ${
           isOpen 
             ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700' 

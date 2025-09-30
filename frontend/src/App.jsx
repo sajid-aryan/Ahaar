@@ -10,6 +10,7 @@ import NGOProfilesPage from './pages/NGOProfilesPage.jsx'
 import NGOProfileDetailPage from './pages/NGOProfileDetailPage.jsx'
 import ManageNGOProfilePage from './pages/ManageNGOProfilePage.jsx'
 import ManageUserProfilePage from './pages/ManageUserProfilePage.jsx'
+import DonorProfilePage from './pages/DonorProfilePage.jsx'
 import Footer from './components/Footer.jsx'
 import Navbar from './components/Navbar.jsx'
 import Chatbot from './components/Chatbot.jsx'
@@ -62,6 +63,7 @@ function App() {
 					<Route path="/about" element={<About />} />
 					<Route path="/ngo-profiles" element={<NGOProfilesPage />} />
 					<Route path="/ngo-profile/:id" element={<NGOProfileDetailPage />} />
+					<Route path="/donor-profile/:donorId" element={<DonorProfilePage />} />
 					<Route 
 						path="/manage-profile" 
 						element={

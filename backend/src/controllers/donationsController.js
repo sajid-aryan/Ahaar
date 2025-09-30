@@ -1,5 +1,5 @@
 import Donation from '../models/Donation.js';
-import User from '../models/user.model.js';
+import { User } from '../models/user.model.js';
 
 // Get all donations (for browse page)
 export async function getAllDonations(req, res) {
@@ -18,7 +18,7 @@ export async function getAllDonations(req, res) {
     // Then fetch only available donations (exclude claimed, completed, and expired)
     const donations = await Donation.find({ status: 'available' })
       .sort({ createdAt: -1 })
-      .populate('donorId', 'name userType')
+      .populate('donorId', 'name userType averageRating totalRatings')
       .populate('claimerId', 'name userType');
     
     res.status(200).json({ 
@@ -435,6 +435,15 @@ export async function submitFeedback(req, res) {
     
     await donation.save();
     
+    // Update donor's rating statistics
+    const donor = await User.findById(donation.donorId);
+    if (donor) {
+      donor.ratingSum += rating;
+      donor.totalRatings += 1;
+      donor.averageRating = donor.ratingSum / donor.totalRatings;
+      await donor.save();
+    }
+    
     res.status(200).json({ 
       success: true, 
       message: 'Feedback submitted successfully',
@@ -446,6 +455,64 @@ export async function submitFeedback(req, res) {
       success: false, 
       message: 'Error submitting feedback', 
       error: error.message 
+    });
+  }
+}
+
+// Get donor profile with ratings and reviews
+export async function getDonorProfile(req, res) {
+  try {
+    const { donorId } = req.params;
+    console.log('Fetching donor profile for ID:', donorId);
+    
+    // Get donor information
+    const donor = await User.findById(donorId).select('name userType averageRating totalRatings donationsCount totalMoneyDonated createdAt');
+    
+    if (!donor) {
+      console.log('Donor not found for ID:', donorId);
+      return res.status(404).json({
+        success: false,
+        message: 'Donor not found'
+      });
+    }
+    
+    console.log('Donor found:', donor.name);
+    
+    // Get completed donations with feedback for this donor
+    const donationsWithFeedback = await Donation.find({
+      donorId: donorId,
+      status: 'completed',
+      'feedback.ngoRating': { $exists: true }
+    })
+    .populate('claimerId', 'name')
+    .select('title description category feedback claimerId completedAt')
+    .sort({ completedAt: -1 });
+    
+    console.log('Found reviews:', donationsWithFeedback.length);
+    
+    // Get total completed donations count
+    const totalCompletedDonations = await Donation.countDocuments({
+      donorId: donorId,
+      status: 'completed'
+    });
+    
+    console.log('Total completed donations:', totalCompletedDonations);
+    
+    res.status(200).json({
+      success: true,
+      donor: {
+        ...donor.toObject(),
+        completedDonationsCount: totalCompletedDonations
+      },
+      reviews: donationsWithFeedback,
+      reviewCount: donationsWithFeedback.length
+    });
+  } catch (error) {
+    console.error('Error fetching donor profile:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching donor profile',
+      error: error.message
     });
   }
 }

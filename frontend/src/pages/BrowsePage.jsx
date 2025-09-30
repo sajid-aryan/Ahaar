@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from 'react-router';
-import { ArrowLeft, MapPin, Package, Heart, Clock, Phone, Info } from 'lucide-react';
+import { ArrowLeft, MapPin, Package, Heart, Clock, Phone, Info, Star } from 'lucide-react';
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 import { formatDate } from '../../utils/date';
@@ -143,6 +143,35 @@ const BrowsePage = () => {
     setRatingModal({ isOpen: false, donationId: null, rating: 0, comment: '' });
   };
 
+  const renderStars = (rating) => {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    
+    for (let i = 0; i < 5; i++) {
+      if (i < fullStars) {
+        stars.push(
+          <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+        );
+      } else if (i === fullStars && hasHalfStar) {
+        stars.push(
+          <div key={i} className="relative">
+            <Star className="w-3 h-3 text-gray-300" />
+            <div className="absolute inset-0 overflow-hidden w-1/2">
+              <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+            </div>
+          </div>
+        );
+      } else {
+        stars.push(
+          <Star key={i} className="w-3 h-3 text-gray-300" />
+        );
+      }
+    }
+    
+    return stars;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-slate-100 to-green-50">
       <div className="container mx-auto px-6 py-8">
@@ -255,7 +284,29 @@ const BrowsePage = () => {
                   
                   <div className="card-actions justify-between mt-4">
                     <div className="text-xs text-gray-500">
-                      By {donation.donorName} ({donation.donorType})
+                      <div className="flex items-center gap-2">
+                        <span>By </span>
+                        <Link 
+                          to={`/donor-profile/${donation.donorId._id}`}
+                          className="text-blue-600 hover:text-blue-800 font-medium hover:underline"
+                        >
+                          {donation.donorName}
+                        </Link>
+                        <span>({donation.donorType})</span>
+                        {donation.donorId.averageRating > 0 && (
+                          <div className="flex items-center gap-1 ml-2">
+                            <div className="flex">
+                              {renderStars(donation.donorId.averageRating)}
+                            </div>
+                            <span className="text-xs text-gray-600">
+                              {donation.donorId.averageRating.toFixed(1)}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              ({donation.donorId.totalRatings})
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                     <div className="flex gap-2 items-center">
                       {/* Like Button and Count */}
