@@ -5,7 +5,9 @@ import {
     markAsRead,
     markAllAsRead,
     deleteNotification,
-    getUnreadCount
+    clearAllNotifications,
+    getUnreadCount,
+    createTestNotifications
 } from '../controllers/notificationController.js';
 
 const router = express.Router();
@@ -19,11 +21,17 @@ router.get('/', getNotifications);
 // Get unread notification count
 router.get('/unread-count', getUnreadCount);
 
+// Test function to create sample notifications
+router.post('/test', createTestNotifications);
+
 // Mark a specific notification as read
 router.put('/:notificationId/read', markAsRead);
 
 // Mark all notifications as read
 router.put('/mark-all-read', markAllAsRead);
+
+// Clear all notifications
+router.delete('/clear-all', clearAllNotifications);
 
 // Delete a specific notification
 router.delete('/:notificationId', deleteNotification);

@@ -149,6 +149,30 @@ export const deleteNotification = async (req, res) => {
     }
 };
 
+// Clear all notifications for a user
+export const clearAllNotifications = async (req, res) => {
+    try {
+        const userId = req.userId;
+        
+        const result = await Notification.deleteMany({
+            userId
+        });
+        
+        res.status(200).json({
+            success: true,
+            message: `Cleared ${result.deletedCount} notifications`,
+            deletedCount: result.deletedCount
+        });
+    } catch (error) {
+        console.error('Error clearing all notifications:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error clearing all notifications',
+            error: error.message
+        });
+    }
+};
+
 // Get unread notification count
 export const getUnreadCount = async (req, res) => {
     try {
@@ -168,6 +192,97 @@ export const getUnreadCount = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Error getting unread count',
+            error: error.message
+        });
+    }
+};
+
+// Test function to create sample notifications
+export const createTestNotifications = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const { count = 3 } = req.body;
+        
+        // Sample notification data
+        const sampleNotifications = [
+            {
+                type: 'donation_claimed',
+                title: '🎉 Your donation has been claimed!',
+                message: 'Great news! NGO Helper has claimed your "Fresh Vegetables" donation. They will be in touch for pickup arrangements.',
+                data: {
+                    donationId: null,
+                    claimerId: null,
+                    claimerName: 'NGO Helper'
+                }
+            },
+            {
+                type: 'feedback_received',
+                title: '⭐ New feedback from Helping Hands NGO!',
+                message: 'You received a Excellent (5/5) rating for your "Winter Clothes" donation. They also left a comment: "Amazing quality clothes, helped many families!"',
+                data: {
+                    donationId: null,
+                    claimerId: null,
+                    claimerName: 'Helping Hands NGO',
+                    rating: 5,
+                    feedback: 'Amazing quality clothes, helped many families!'
+                }
+            },
+            {
+                type: 'donation_completed',
+                title: '✅ Donation completed successfully!',
+                message: 'Your "Food Packages" donation has been successfully completed and distributed. Thank you for making a difference!',
+                data: {
+                    donationId: null,
+                    claimerId: null,
+                    claimerName: 'Community Kitchen'
+                }
+            },
+            {
+                type: 'feedback_received',
+                title: '⭐ New feedback from Street Angels!',
+                message: 'You received a Very Good (4/5) rating for your "Medical Supplies" donation. They also left a comment: "Very helpful supplies, reached those in need quickly."',
+                data: {
+                    donationId: null,
+                    claimerId: null,
+                    claimerName: 'Street Angels',
+                    rating: 4,
+                    feedback: 'Very helpful supplies, reached those in need quickly.'
+                }
+            },
+            {
+                type: 'donation_claimed',
+                title: '🎉 Another donation claimed!',
+                message: 'Wonderful! Food Bank Central has claimed your "Canned Goods" donation. They will contact you soon for pickup details.',
+                data: {
+                    donationId: null,
+                    claimerId: null,
+                    claimerName: 'Food Bank Central'
+                }
+            }
+        ];
+        
+        const notifications = [];
+        
+        for (let i = 0; i < Math.min(count, sampleNotifications.length); i++) {
+            const notificationData = {
+                userId,
+                ...sampleNotifications[i]
+            };
+            
+            const notification = await createNotification(notificationData);
+            notifications.push(notification);
+        }
+        
+        res.status(200).json({
+            success: true,
+            message: `Successfully created ${notifications.length} test notifications`,
+            notifications
+        });
+    } catch (error) {
+        console.error('Error creating test notifications:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error creating test notifications',
             error: error.message
         });
     }

@@ -10,6 +10,8 @@ import ngoProfileRoutes from './routes/ngoProfileRoutes.js';
 import userProfileRoutes from './routes/userProfileRoutes.js';
 import chatbotRoutes from './routes/chatbotRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import adminRoutes from './routes/admin.js';
+import reportRoutes from './routes/reports.js';
 import { connectDB } from './config/db.js';
 import { startExpiryChecker } from './utils/cronJobs.js';
 
@@ -24,9 +26,25 @@ const app = express();
 const PORT = process.env.PORT || 3004;
 
 // Middleware
+const allowedOrigins = [
+  "http://localhost:5173", 
+  "http://localhost:5174",
+  "https://your-frontend-deployment.vercel.app", // Replace with your actual frontend URL
+  process.env.FRONTEND_URL
+].filter(Boolean);
 
 app.use(cors({
-	origin: "http://localhost:5173",
+	origin: function (origin, callback) {
+		// Allow requests with no origin (like mobile apps or curl requests)
+		if (!origin) return callback(null, true);
+		
+		if (allowedOrigins.includes(origin)) {
+			return callback(null, true);
+		}
+		
+		const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+		return callback(new Error(msg), false);
+	},
 	credentials: true
 }));
 app.use(express.json());
@@ -47,6 +65,8 @@ app.use("/api/ngo-profiles", ngoProfileRoutes);
 app.use("/api/user-profile", userProfileRoutes);
 app.use("/api/chatbot", chatbotRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/reports", reportRoutes);
 
 // Dashboard and donation management system
 connectDB().then(() => {

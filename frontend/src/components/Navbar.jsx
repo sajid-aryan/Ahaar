@@ -1,15 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Info, Menu, Home, UserPlus, LogIn, LogOut, User, History, Package, Building2, Settings } from 'lucide-react';
+import { Info, Menu, Home, UserPlus, LogIn, LogOut, User, History, Package, Building2, Settings, Shield } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import NotificationBell from './NotificationBell';
-import NotificationPanel from './NotificationPanel';
+import NotificationDropdown from './NotificationPanel';
 
 const Navbar = () => {
   const { isAuthenticated, logout, user } = useAuthStore();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isNotificationPanelOpen, setIsNotificationPanelOpen] = useState(false);
+  const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   // Close dropdown when clicking outside
@@ -101,10 +101,16 @@ const Navbar = () => {
       <div className="flex-none gap-2">
         {/* Notification Bell - Only show when user is logged in */}
         {isAuthenticated && (
-          <NotificationBell 
-            onClick={() => setIsNotificationPanelOpen(true)}
-            className="mr-2"
-          />
+          <div className="relative">
+            <NotificationBell 
+              onClick={() => setIsNotificationDropdownOpen(!isNotificationDropdownOpen)}
+              className="mr-2"
+            />
+            <NotificationDropdown 
+              isOpen={isNotificationDropdownOpen}
+              onClose={() => setIsNotificationDropdownOpen(false)}
+            />
+          </div>
         )}
         
         <div className="relative" ref={dropdownRef}>
@@ -160,6 +166,13 @@ const Navbar = () => {
                         <Package /> My Donations
                       </Link>
                     </motion.li>
+                    {user?.userType === 'admin' && (
+                      <motion.li variants={itemVariants} whileHover={{ x: 5 }}>
+                        <Link to="/admin" onClick={closeDropdown} className="flex items-center gap-2 transition-colors hover:bg-purple-100">
+                          <Shield /> Admin Dashboard
+                        </Link>
+                      </motion.li>
+                    )}
                     {user?.userType === 'ngo' ? (
                       <>
                         <motion.li variants={itemVariants} whileHover={{ x: 5 }}>
@@ -208,12 +221,6 @@ const Navbar = () => {
         </div>
       </div>
     </motion.div>
-
-    {/* Notification Panel */}
-    <NotificationPanel 
-      isOpen={isNotificationPanelOpen}
-      onClose={() => setIsNotificationPanelOpen(false)}
-    />
   </>
   );
 };

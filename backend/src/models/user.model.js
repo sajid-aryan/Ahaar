@@ -22,8 +22,19 @@ const userSchema = new mongoose.Schema(
 		userType: {
 			type: String,
 			required: true,
-			enum: ['ngo', 'individual', 'restaurant'],
+			enum: ['ngo', 'individual', 'restaurant', 'admin'],
 			default: 'individual'
+		},
+		isVerified: {
+			type: Boolean,
+			default: false
+		},
+		verifiedAt: {
+			type: Date
+		},
+		verifiedBy: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'User'
 		},
 		lastLogin: {
 			type: Date,

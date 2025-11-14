@@ -1,15 +1,30 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, X, Check, Star, Package, Gift, Clock, Trash2 } from 'lucide-react';
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 import toast from 'react-hot-toast';
 
-const NotificationPanel = ({ isOpen, onClose }) => {
+const NotificationDropdown = ({ isOpen, onClose }) => {
   const { user } = useAuthStore();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isOpen, onClose]);
 
   useEffect(() => {
     if (isOpen && user) {
@@ -21,7 +36,8 @@ const NotificationPanel = ({ isOpen, onClose }) => {
     setLoading(true);
     try {
       const response = await axios.get('http://localhost:3004/api/notifications', {
-        withCredentials: true
+        withCredentials: true,
+        params: { limit: 10 } // Limit to 10 recent notifications for dropdown
       });
       
       if (response.data.success) {
@@ -87,16 +103,38 @@ const NotificationPanel = ({ isOpen, onClose }) => {
     }
   };
 
+  const clearAllNotifications = async () => {
+    // Confirm before clearing all notifications
+    if (!window.confirm('Are you sure you want to clear all notifications? This action cannot be undone.')) {
+      return;
+    }
+    
+    try {
+      const response = await axios.delete('http://localhost:3004/api/notifications/clear-all', {
+        withCredentials: true
+      });
+      
+      if (response.data.success) {
+        setNotifications([]);
+        setUnreadCount(0);
+        toast.success(`✅ Cleared ${response.data.deletedCount} notifications`);
+      }
+    } catch (error) {
+      console.error('Error clearing all notifications:', error);
+      toast.error('Failed to clear all notifications');
+    }
+  };
+
   const getNotificationIcon = (type) => {
     switch (type) {
       case 'donation_claimed':
-        return <Gift className="w-5 h-5 text-green-500" />;
+        return <Gift className="w-4 h-4 text-green-500" />;
       case 'feedback_received':
-        return <Star className="w-5 h-5 text-yellow-500" />;
+        return <Star className="w-4 h-4 text-yellow-500" />;
       case 'donation_completed':
-        return <Check className="w-5 h-5 text-blue-500" />;
+        return <Check className="w-4 h-4 text-blue-500" />;
       default:
-        return <Bell className="w-5 h-5 text-gray-500" />;
+        return <Bell className="w-4 h-4 text-gray-500" />;
     }
   };
 
@@ -121,78 +159,91 @@ const NotificationPanel = ({ isOpen, onClose }) => {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0, x: 300 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 300 }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-          className="fixed top-0 right-0 h-full w-96 bg-white shadow-2xl z-50 overflow-hidden"
+          ref={dropdownRef}
+          initial={{ opacity: 0, y: -10, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -10, scale: 0.95 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          className="absolute top-full right-0 mt-2 w-96 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 overflow-hidden"
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-4 text-white">
-            <div className="flex items-center justify-between mb-2">
+          <div className="bg-gradient-to-r from-pink-500 to-green-500 px-4 py-3 text-white">
+            <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <Bell className="w-6 h-6 mr-2" />
-                <h2 className="text-xl font-bold">Notifications</h2>
+                <Bell className="w-5 h-5 mr-2" />
+                <h3 className="font-semibold">Notifications</h3>
                 {unreadCount > 0 && (
-                  <span className="ml-2 bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">
+                  <span className="ml-2 bg-red-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center font-bold">
                     {unreadCount}
                   </span>
                 )}
               </div>
               <button
                 onClick={onClose}
-                className="text-white hover:text-gray-200 transition-colors"
+                className="text-white hover:text-gray-200 transition-colors p-1"
               >
-                <X size={24} />
+                <X size={18} />
               </button>
             </div>
             
-            {unreadCount > 0 && (
-              <button
-                onClick={markAllAsRead}
-                className="text-sm text-blue-100 hover:text-white transition-colors"
-              >
-                Mark all as read
-              </button>
+            {notifications.length > 0 && (
+              <div className="flex gap-2 mt-2">
+                {unreadCount > 0 && (
+                  <button
+                    onClick={markAllAsRead}
+                    className="text-xs text-pink-100 hover:text-white transition-all duration-200 px-3 py-1.5 rounded-md bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/30 font-medium"
+                  >
+                    ✓ Mark all read
+                  </button>
+                )}
+                
+                <button
+                  onClick={clearAllNotifications}
+                  className="text-xs text-pink-100 hover:text-red-200 transition-all duration-200 px-3 py-1.5 rounded-md bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 hover:border-red-400/50 font-medium"
+                >
+                  🗑️ Clear all
+                </button>
+              </div>
             )}
           </div>
 
           {/* Notifications List */}
-          <div className="flex-1 overflow-y-auto h-full pb-4">
+          <div className="max-h-96 overflow-y-auto">
             {loading ? (
-              <div className="flex items-center justify-center h-32">
-                <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+              <div className="flex items-center justify-center h-24">
+                <div className="w-6 h-6 border-2 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
               </div>
             ) : notifications.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-32 text-gray-500">
-                <Bell className="w-12 h-12 mb-2 opacity-50" />
-                <p>No notifications yet</p>
+              <div className="flex flex-col items-center justify-center h-24 text-gray-500">
+                <Bell className="w-8 h-8 mb-1 opacity-50" />
+                <p className="text-sm">No notifications yet</p>
               </div>
             ) : (
-              <div className="space-y-1">
-                {notifications.map((notification) => (
+              <div>
+                {notifications.map((notification, index) => (
                   <motion.div
                     key={notification._id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={`p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer group ${
-                      !notification.read ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className={`p-3 border-b border-gray-100 hover:bg-gradient-to-r hover:from-pink-50 hover:to-green-50 transition-colors cursor-pointer group ${
+                      !notification.read ? 'bg-gradient-to-r from-pink-50 to-green-50 border-l-4 border-l-pink-500' : ''
                     }`}
                     onClick={() => !notification.read && markAsRead(notification._id)}
                   >
                     <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0 mt-1">
+                      <div className="flex-shrink-0 mt-0.5">
                         {getNotificationIcon(notification.type)}
                       </div>
                       
                       <div className="flex-1 min-w-0">
-                        <h3 className={`text-sm font-medium text-gray-900 mb-1 ${
+                        <h4 className={`text-sm font-medium text-gray-900 mb-1 line-clamp-1 ${
                           !notification.read ? 'font-bold' : ''
                         }`}>
                           {notification.title}
-                        </h3>
+                        </h4>
                         
-                        <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                        <p className="text-xs text-gray-600 mb-2 line-clamp-2">
                           {notification.message}
                         </p>
                         
@@ -207,9 +258,9 @@ const NotificationPanel = ({ isOpen, onClose }) => {
                               e.stopPropagation();
                               deleteNotification(notification._id);
                             }}
-                            className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-all"
+                            className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-all p-1"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3 h-3" />
                           </button>
                         </div>
                         
@@ -237,6 +288,14 @@ const NotificationPanel = ({ isOpen, onClose }) => {
                     </div>
                   </motion.div>
                 ))}
+                
+                {notifications.length >= 10 && (
+                  <div className="p-3 text-center border-t border-gray-200 bg-gradient-to-r from-pink-50 to-green-50">
+                    <button className="text-sm text-pink-600 hover:text-pink-800 font-medium">
+                      View All Notifications
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -246,4 +305,4 @@ const NotificationPanel = ({ isOpen, onClose }) => {
   );
 };
 
-export default NotificationPanel;
+export default NotificationDropdown;

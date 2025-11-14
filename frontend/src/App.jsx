@@ -13,9 +13,11 @@ import ManageNGOProfilePage from './pages/ManageNGOProfilePage.jsx'
 import ManageUserProfilePage from './pages/ManageUserProfilePage.jsx'
 import DonorProfilePage from './pages/DonorProfilePage.jsx'
 import ComingSoonPage from './pages/ComingSoonPage.jsx'
+import AdminDashboardPage from './pages/AdminDashboard.jsx'
 import Footer from './components/Footer.jsx'
 import Navbar from './components/Navbar.jsx'
 import Chatbot from './components/Chatbot.jsx'
+// import NotificationTester from './components/NotificationTester.jsx' // Commented out for production - uncomment to test notifications
 import SignUpPage from "./pages/SignUpPage";
 import LoginPage from "./pages/LoginPage";
 import LoadingSpinner from "./components/LoadingSpinner";
@@ -33,6 +35,20 @@ const ProtectedRoute = ({ children }) => {
 	return children;
 };
 
+const AdminProtectedRoute = ({ children }) => {
+	const { isAuthenticated, user } = useAuthStore();
+
+	if (!isAuthenticated) {
+		return <Navigate to='/login' replace />;
+	}
+
+	if (!user || user.userType !== 'admin') {
+		return <Navigate to='/' replace />;
+	}
+
+	return children;
+};
+
 // redirect authenticated users to the home page
 const RedirectAuthenticatedUser = ({ children }) => {
 	const { isAuthenticated } = useAuthStore();
@@ -45,7 +61,7 @@ const RedirectAuthenticatedUser = ({ children }) => {
 };
 
 function App() {
-	const { isCheckingAuth, checkAuth } = useAuthStore();
+	const { isCheckingAuth, checkAuth, isAuthenticated } = useAuthStore();
 	const location = useLocation();
 
 	useEffect(() => {
@@ -180,6 +196,16 @@ function App() {
 								</ProtectedRoute>
 							} 
 						/>
+						<Route 
+							path="/admin" 
+							element={
+								<AdminProtectedRoute>
+									<motion.div {...pageTransition}>
+										<AdminDashboardPage />
+									</motion.div>
+								</AdminProtectedRoute>
+							} 
+						/>
 						<Route
 							path='/signup'
 							element={
@@ -207,6 +233,11 @@ function App() {
 			</motion.main>
 			<Footer />
 			<Chatbot />
+			
+			{/* Notification Tester - Commented out for production */}
+			{/* Uncomment the line below to enable notification testing */}
+			{/* {isAuthenticated && <NotificationTester />} */}
+			
 			<Toaster />
 		</div>
 	);
