@@ -91,8 +91,7 @@ This platform includes:
 
 **Sajid Aryan**
 - GitHub: [@sajid-aryan](https://github.com/sajid-aryan)
-- Email: [your-email@domain.com]
-- LinkedIn: [Your LinkedIn Profile]
+- Email: sajid.aryan2002@gmail.com
 
 ---
 
