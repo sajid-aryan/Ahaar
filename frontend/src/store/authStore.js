@@ -3,7 +3,7 @@ import axios from "axios";
 
 const API_URL = import.meta.env.MODE === "development" 
   ? "http://localhost:3004/api/auth" 
-  : `${import.meta.env.VITE_API_BASE_URL || 'https://ahaarbackend.vercel.app'}/api/auth`;
+  : `${import.meta.env.VITE_API_BASE_URL || 'https://ahaarbackend-d43pois43-sajid-aryan-samis-projects.vercel.app'}/api/auth`;
 
 axios.defaults.withCredentials = true;
 
