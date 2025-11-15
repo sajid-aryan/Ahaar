@@ -72,7 +72,7 @@ This platform includes:
 
 ## 🚀 Live Demo
 
-[View Live Application](https://your-deployment-url.vercel.app) *(Demo available upon request)*
+[View Live Application](https://your-deployment-url.vercel.app) - Backend not deployed yet
 
 ## � Preview
 
