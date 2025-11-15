@@ -13,6 +13,11 @@
       "dest": "src/server.js"
     }
   ],
+  "functions": {
+    "src/server.js": {
+      "maxDuration": 30
+    }
+  },
   "env": {
     "MONGODB_URI": "@mongodb_uri",
     "JWT_SECRET": "@jwt_secret", 
