@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 import { formatDate } from '../../utils/date';
+import { apiUrl } from '../utils/api';
 import toast from 'react-hot-toast';
 
 const ClaimedDonationsPage = () => {
@@ -18,7 +19,7 @@ const ClaimedDonationsPage = () => {
   useEffect(() => {
     const fetchClaimedDonations = async () => {
       try {
-        const res = await axios.get(`http://localhost:3004/api/donations/claimed/${user._id}`, {
+        const res = await axios.get(apiUrl(`/api/donations/claimed/${user._id}`), {
           withCredentials: true
         });
         console.log('Claimed donations response:', res.data);
@@ -50,7 +51,7 @@ const ClaimedDonationsPage = () => {
     setSubmittingFeedback(feedbackModal.donationId);
     
     try {
-      const response = await axios.post(`http://localhost:3004/api/donations/${feedbackModal.donationId}/feedback`, {
+      const response = await axios.post(apiUrl(`/api/donations/${feedbackModal.donationId}/feedback`), {
         rating: feedbackModal.rating,
         comment: feedbackModal.comment
       }, {
@@ -269,7 +270,7 @@ const ClaimedDonationsPage = () => {
                 {donation.image && (
                   <figure className="relative overflow-hidden rounded-t-lg">
                     <img 
-                      src={`http://localhost:3004${donation.image}`}
+                      src={apiUrl(donation.image)}
                       alt={donation.title}
                       className="h-48 w-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />

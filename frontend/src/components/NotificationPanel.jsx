@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, X, Check, Star, Package, Gift, Clock, Trash2 } from 'lucide-react';
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
+import { apiUrl } from '../utils/api';
 import toast from 'react-hot-toast';
 
 const NotificationDropdown = ({ isOpen, onClose }) => {

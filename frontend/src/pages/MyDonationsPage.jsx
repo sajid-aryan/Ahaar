@@ -5,6 +5,7 @@ import { ArrowLeft, MapPin, Package, Calendar, User, Star, Trash2, Edit, X, Save
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 import { formatDate } from '../../utils/date';
+import { apiUrl } from '../utils/api';
 import toast from 'react-hot-toast';
 
 const MyDonationsPage = () => {
@@ -19,7 +20,7 @@ const MyDonationsPage = () => {
   useEffect(() => {
     const fetchMyDonations = async () => {
       try {
-        const res = await axios.get(`http://localhost:3004/api/donations/my/${user._id}`, {
+        const res = await axios.get(apiUrl(`/api/donations/my/${user._id}`), {
           withCredentials: true
         });
         console.log('My donations response:', res.data);
@@ -48,7 +49,7 @@ const MyDonationsPage = () => {
     setDeletingId(donationId);
     
     try {
-      const response = await axios.delete(`http://localhost:3004/api/donations/${donationId}`, {
+      const response = await axios.delete(apiUrl(`/api/donations/${donationId}`), {
         withCredentials: true
       });
 
@@ -91,7 +92,7 @@ const MyDonationsPage = () => {
     }
 
     try {
-      const response = await axios.put(`http://localhost:3004/api/donations/${editingId}`, 
+      const response = await axios.put(apiUrl(`/api/donations/${editingId}`), 
         editFormData, 
         { withCredentials: true }
       );
@@ -309,7 +310,7 @@ const MyDonationsPage = () => {
                 {donation.image && (
                   <figure className="relative overflow-hidden rounded-t-lg">
                     <img 
-                      src={`http://localhost:3004${donation.image}`}
+                      src={apiUrl(donation.image)}
                       alt={donation.title}
                       className="h-48 w-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
