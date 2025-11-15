@@ -91,7 +91,7 @@ This platform includes:
 
 **Sajid Aryan**
 - GitHub: [@sajid-aryan](https://github.com/sajid-aryan)
-- Email: [sajid.aryan2002@gmail.com]
+- Email: sajid.aryan2002@gmail.com
 
 ---
 
