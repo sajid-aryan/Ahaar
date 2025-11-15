@@ -29,8 +29,10 @@ const PORT = process.env.PORT || 3004;
 const allowedOrigins = [
   "http://localhost:5173", 
   "http://localhost:5174",
-  "https://ahaar-sage.vercel.app", // Your frontend URL
-  "https://ahaar.vercel.app", // Alternative frontend URL
+  "https://ahaar-psi.vercel.app", // Your correct frontend URL
+  "https://ahaar-p5l.vercel.app",
+  "https://ahaar-sage.vercel.app",
+  "https://ahaar.vercel.app",
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
