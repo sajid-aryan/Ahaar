@@ -5,6 +5,7 @@ import { ArrowLeft, MapPin, Package, Heart, Clock, Phone, Info, Star } from 'luc
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 import { formatDate } from '../../utils/date';
+import { apiUrl } from '../utils/api';
 import toast from 'react-hot-toast';
 import ClaimConfirmationModal from '../components/ClaimConfirmationModal';
 
@@ -26,7 +27,7 @@ const BrowsePage = () => {
   useEffect(() => {
     const fetchDonations = async () => {
       try {
-        const res = await axios.get("http://localhost:3004/api/donations");
+        const res = await axios.get(apiUrl("/api/donations"));
         console.log('Donations response:', res.data);
         setDonations(res.data.donations || []);
       } catch (error) {
@@ -92,7 +93,7 @@ const BrowsePage = () => {
     setClaimingId(donationId);
     
     try {
-      const response = await axios.post(`http://localhost:3004/api/donations/${donationId}/claim`, {
+      const response = await axios.post(apiUrl(`/api/donations/${donationId}/claim`), {
         claimerId: user._id,
         claimerName: user.name
       }, {
@@ -134,7 +135,7 @@ const BrowsePage = () => {
     setLikingId(donationId);
     
     try {
-      const response = await axios.post(`http://localhost:3004/api/donations/${donationId}/like`, {}, {
+      const response = await axios.post(apiUrl(`/api/donations/${donationId}/like`), {}, {
         withCredentials: true
       });
 
@@ -426,7 +427,7 @@ const BrowsePage = () => {
                 {donation.image && (
                   <figure className="relative overflow-hidden">
                     <img 
-                      src={`http://localhost:3004${donation.image}`}
+                      src={apiUrl(donation.image)}
                       alt={donation.title}
                       className="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />

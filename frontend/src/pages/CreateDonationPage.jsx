@@ -4,6 +4,7 @@ import { ArrowLeft, MapPin, Clock, Package, AlertCircle, Upload, X } from 'lucid
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../store/authStore';
+import { apiUrl } from '../utils/api';
 
 const CreateDonationPage = () => {
   const navigate = useNavigate();
@@ -103,7 +104,7 @@ const CreateDonationPage = () => {
         formDataToSend.append('image', selectedImage);
       }
 
-      const response = await axios.post('http://localhost:3004/api/donations', formDataToSend, {
+      const response = await axios.post(apiUrl('/api/donations'), formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
