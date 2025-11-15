@@ -29,7 +29,7 @@ const PORT = process.env.PORT || 3004;
 const allowedOrigins = [
   "http://localhost:5173", 
   "http://localhost:5174",
-  "https://your-frontend-deployment.vercel.app", // Replace with your actual frontend URL
+  "https://ahaar-sage.vercel.app", // Your actual frontend URL
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
@@ -37,6 +37,11 @@ app.use(cors({
 	origin: function (origin, callback) {
 		// Allow requests with no origin (like mobile apps or curl requests)
 		if (!origin) return callback(null, true);
+		
+		// Allow all Vercel deployments for your project
+		if (origin.includes('ahaar') && origin.includes('vercel.app')) {
+			return callback(null, true);
+		}
 		
 		if (allowedOrigins.includes(origin)) {
 			return callback(null, true);
