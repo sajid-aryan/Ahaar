@@ -1,7 +1,7 @@
 // API Configuration for production deployment
 const API_BASE_URL = import.meta.env.MODE === "development" 
   ? "http://localhost:3004" 
-  : import.meta.env.VITE_API_BASE_URL || 'https://ahaarbackend-qv6hf1d1b-sajid-aryan-samis-projects.vercel.app';
+  : import.meta.env.VITE_API_BASE_URL || 'https://ahaar-steel.vercel.app';
 
 export const apiUrl = (endpoint) => `${API_BASE_URL}${endpoint}`;
 
