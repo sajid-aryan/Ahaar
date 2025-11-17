@@ -76,18 +76,14 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/reports", reportRoutes);
 
-// Connect to database
-connectDB();
+// Connect to database (call it but don't await in serverless)
+connectDB().catch(err => console.error('MongoDB connection error:', err));
 
-// Start expiry checker (only in non-serverless environments)
-if (process.env.NODE_ENV !== 'production') {
-  startExpiryChecker();
-}
-
-// For local development
-if (process.env.NODE_ENV !== 'production') {
+// For local development only
+if (process.env.VERCEL !== '1') {
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
+    startExpiryChecker();
   });
 }
 
