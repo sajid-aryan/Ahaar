@@ -76,14 +76,20 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/reports", reportRoutes);
 
-// Dashboard and donation management system
-connectDB().then(() => {
+// Connect to database
+connectDB();
+
+// Start expiry checker (only in non-serverless environments)
+if (process.env.NODE_ENV !== 'production') {
+  startExpiryChecker();
+}
+
+// For local development
+if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
-    // Start the expiry checker after server starts
-    startExpiryChecker();
   });
-});
+}
 
 // Export the Express app for Vercel serverless
 export default app;
