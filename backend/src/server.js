@@ -85,3 +85,5 @@ connectDB().then(() => {
   });
 });
 
+// Export the Express app for Vercel serverless
+export default app;
