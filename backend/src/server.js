@@ -76,14 +76,16 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/reports", reportRoutes);
 
-// Connect to database (call it but don't await in serverless)
-connectDB().catch(err => console.error('MongoDB connection error:', err));
-
 // For local development only
 if (process.env.VERCEL !== '1') {
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-    startExpiryChecker();
+  connectDB().then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+      startExpiryChecker();
+    });
+  }).catch(err => {
+    console.error('Failed to start server:', err);
+    process.exit(1);
   });
 }
 
